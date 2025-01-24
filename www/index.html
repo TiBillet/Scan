@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>QR Code Scanner</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <h1>Scanner un QR Code (ZXing)</h1>
+    <button onclick="scanQRCode()">Lancer le scan</button>
+
+    <div id="result">
+      <h3>Résultat :</h3>
+      <p id="qr-content">Aucun scan effectué</p>
+    </div>
+
+    <script src="cordova.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/scanner.js"></script>
+  </body>
+</html>
