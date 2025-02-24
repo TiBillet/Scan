@@ -17,21 +17,23 @@ function scanQRCode() {
             console.error(err);
           }
         } else {
-          // mettre à jour le contenu scanné
-          const qrContent = document.getElementById("qr-content");
-          qrContent.innerText = text;
-
-          // rendre l'URL cliquable
-          qrContent.onclick = function () {
-            openInAppBrowser(text);
-          };
           console.log("QR Code scanné :", text);
-        }
+          alert("QR Code détecté : " + text); // Affiche le texte brut scanné
 
-        QRScanner.destroy(); // arreter la cam
+          // Vérifier si c'est une URL
+          if (text.startsWith("http://") || text.startsWith("https://")) {
+            console.log("🔗 C'est une URL, ouverture dans InAppBrowser !");
+            openInAppBrowser(text);
+          } else {
+            console.log("🎟️ C'est un billet, vérification en cours...");
+            verifierBilletLocal(text);
+          }
+
+          QRScanner.destroy();
+        }
       });
 
-      QRScanner.show(); // afficher la cam
+      QRScanner.show();
     } else if (status.denied) {
       alert("Permission refusée. Activez-la dans les paramètres.");
     } else {
@@ -40,9 +42,7 @@ function scanQRCode() {
   });
 }
 
-// fonction pour ouvrir l'url dans InAppBrowser
+// Fonction pour ouvrir une URL dans le navigateur
 function openInAppBrowser(url) {
   cordova.InAppBrowser.open(url, "_system");
-  // "_system" pour ouvrir dans le navigateur par défaut
-  //"_blank" pour l'ouvrir dans fenetre de l'app
 }

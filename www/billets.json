@@ -1,0 +1,17 @@
+[
+    {
+      "id": "BILLET12345",
+      "event": "Festival X",
+      "date": "2025-06-15",
+      "holder": "Jean Dupont",
+      "signature": "c29tZV9zaWduYXR1cmU="
+    },
+    {
+      "id": "BILLET67890",
+      "event": "Festival Y",
+      "date": "2025-07-20",
+      "holder": "Alice Martin",
+      "signature": "YW5vdGhlcl9zaWduYXR1cmU="
+    }
+  ]
+  
