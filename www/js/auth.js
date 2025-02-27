@@ -1,4 +1,4 @@
-const API_URL = "https://ton-serveur.com/api"; // Remplace avec serveur plus tard
+const API_URL = "https://ton-serveur.com/api"; // serveur plus tard
 
 document.getElementById("loginButton").addEventListener("click", login);
 document.getElementById("logoutButton").addEventListener("click", logout);
@@ -20,9 +20,9 @@ async function login() {
 
     localStorage.setItem("jwt", fakeJWT);
     updateUI();
-    alert("✅ Connexion réussie !");
+    alert(" Connexion réussie !");
   } catch (error) {
-    console.error("❌ Erreur de connexion :", error);
+    console.error(" Erreur de connexion :", error);
     alert("Erreur de connexion !");
   }
 }
@@ -30,7 +30,7 @@ async function login() {
 function logout() {
   localStorage.removeItem("jwt");
   updateUI();
-  alert("🚪 Déconnexion réussie !");
+  alert(" Déconnexion réussie !");
 }
 
 function updateUI() {
@@ -38,11 +38,11 @@ function updateUI() {
   if (token) {
     document.getElementById("loginButton").style.display = "none";
     document.getElementById("logoutButton").style.display = "block";
-    document.getElementById("loginStatus").innerText = "✅ Connecté";
+    document.getElementById("loginStatus").innerText = " Connecté";
   } else {
     document.getElementById("loginButton").style.display = "block";
     document.getElementById("logoutButton").style.display = "none";
-    document.getElementById("loginStatus").innerText = "❌ Déconnecté";
+    document.getElementById("loginStatus").innerText = " Déconnecté";
   }
 }
 

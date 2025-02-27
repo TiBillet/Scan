@@ -77,7 +77,7 @@ function fetchSignatureFromServer(billetID) {
     })
     .then((data) => {
       if (data.signature && data.message) {
-        console.log("✅ Signature reçue du serveur !");
+        console.log(" Signature reçue du serveur !");
         verifierSignature(data.signature, data.message);
       } else {
         console.error("⚠️ Signature manquante, passage au mode hors ligne...");
@@ -85,13 +85,13 @@ function fetchSignatureFromServer(billetID) {
       }
     })
     .catch((error) => {
-      console.error("🚨 Erreur API :", error);
-      console.log("🛑 Serveur inaccessible, utilisation du mode hors ligne.");
+      console.error(" Erreur API :", error);
+      console.log(" Serveur inaccessible, utilisation du mode hors ligne.");
       fetchSignatureFromLocal(billetID);
     });
 }
 
-// MODE LOCAL : Vérifier la signature depuis un fichier JSON
+// MODE LOCAL : Vérifier la signature depuis un JSON
 function fetchSignatureFromLocal(billetID) {
   console.log("🔍 Recherche du billet local :", billetID);
 
@@ -100,7 +100,7 @@ function fetchSignatureFromLocal(billetID) {
     .then((data) => {
       const billet = data.find((b) => b.id === billetID);
       if (billet && billet.signature && billet.event && billet.date) {
-        console.log("✅ Billet trouvé :", billet);
+        console.log(" Billet trouvé :", billet);
 
         // Créer le message comme sur le serveur
         const message = JSON.stringify({
@@ -111,13 +111,11 @@ function fetchSignatureFromLocal(billetID) {
 
         verifierSignature(billet.signature, message);
       } else {
-        console.error("❌ Billet non trouvé ou mal formé !");
+        console.error(" Billet non trouvé ou mal formé !");
         alert("Billet invalide !");
       }
     })
-    .catch((error) =>
-      console.error("🚨 Erreur chargement des billets:", error)
-    );
+    .catch((error) => console.error(" Erreur chargement des billets:", error));
 }
 
 // Vérification locale du billet
