@@ -87,3 +87,21 @@ self.addEventListener("fetch", (event) => {
       })
   );
 });
+
+// pour update reload a chaque rebuild
+
+self.addEventListener("install", (event) => {
+  self.skipWaiting(); //forcage installation immédiate du nouveau SW
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          return caches.delete(cacheName); // vide le cache
+        })
+      );
+    })
+  );
+});

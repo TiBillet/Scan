@@ -10,6 +10,16 @@
     <allow-intent href="https://*/*" />
 
     <platform name="android">
+
+    <!-- début pref test HTTP/S CORS -->
+
+    <allow-navigation href="*" />
+    <preference name="scheme" value="http" />
+    <preference name="hostname" value="localhost" />
+    <preference name="android-insecure-http" value="true" />
+
+    <!-- FIN -->
+
     <preference name="AndroidXEnabled" value="true" />
     <preference name="GradlePluginGoogleServicesEnabled" value="true" />
     </platform>
