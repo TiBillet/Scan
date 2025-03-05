@@ -81,15 +81,15 @@ async function fetchSignatureFromServer(billetID) {
     const data = await response.json();
 
     if (data.signature && data.message) {
-      console.log("✅ Signature reçue du serveur !");
+      console.log(" Signature reçue du serveur !");
       verifierSignature(data.signature, data.message);
     } else {
-      console.error("⚠️ Signature manquante, passage au mode hors ligne...");
+      console.error(" Signature manquante, passage au mode hors ligne...");
       fetchSignatureFromLocal(billetID);
     }
   } catch (error) {
-    console.error("🚨 Erreur API :", error);
-    console.log("⚠️ Serveur inaccessible, utilisation du mode hors ligne.");
+    console.error(" Erreur API :", error);
+    console.log(" Serveur inaccessible, utilisation du mode hors ligne.");
     fetchSignatureFromLocal(billetID);
   }
 }

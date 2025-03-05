@@ -68,17 +68,17 @@ async function verifierSignature(signatureBase64, message) {
   -----END PUBLIC KEY-----`;
 
   try {
-    console.log("🔑 Importation de la clé publique...");
+    console.log(" Importation de la clé publique...");
     const publicKey = await importPublicKey(publicKeyPem);
 
-    console.log("📜 Conversion du message en buffer...");
+    console.log(" Conversion du message en buffer...");
     const enc = new TextEncoder();
     const messageBuffer = enc.encode(message);
 
-    console.log("🔄 Conversion de la signature...");
+    console.log(" Conversion de la signature...");
     const signature = base64ToArrayBuffer(signatureBase64);
 
-    console.log("⚖️ Vérification en cours...");
+    console.log(" Vérification en cours...");
     const isValid = await crypto.subtle.verify(
       { name: "RSASSA-PKCS1-v1_5" },
       publicKey,
@@ -94,7 +94,7 @@ async function verifierSignature(signatureBase64, message) {
       alert("Billet invalide !");
     }
   } catch (error) {
-    console.error("🚨 Erreur lors de la vérification RSA :", error);
+    console.error(" Erreur lors de la vérification RSA :", error);
     alert("Une erreur est survenue lors de la vérification !");
   }
 }
