@@ -4,6 +4,14 @@ self.addEventListener("message", (event) => {
   }
 });
 
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(keys.map((key) => caches.delete(key)));
+    })
+  );
+});
+
 const CACHE_NAME = "app-cache-v1";
 const STATIC_ASSETS = [
   "/index.html",

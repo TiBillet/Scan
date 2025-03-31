@@ -27,7 +27,7 @@ async function login() {
   }
 
   console.log(
-    `🔍 Tentative de connexion à : ${API_URL}/users?email=${email}&password=${password}`
+    ` Tentative de connexion à : ${API_URL}/users?email=${email}&password=${password}`
   );
 
   try {
@@ -46,6 +46,7 @@ async function login() {
 
       updateUI();
       alert(" Connexion réussie !");
+      window.location.href = "lieux.html";
     } else {
       alert(" Identifiants incorrects !");
     }
