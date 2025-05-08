@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.scan.QRcode" version="1.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>scanQRcodeApp</name>
+<widget id="com.example.scanqrcode" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>scanQRcodeAppdebug</name>
     <description>Sample Apache Cordova App</description>
     <author email="dev@cordova.apache.org" href="https://cordova.apache.org">
         Apache Cordova Team
@@ -9,7 +9,7 @@
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
 
-    <platform name="android">
+<platform name="android">
 
     <!-- début pref test HTTP/S CORS -->
 
@@ -23,5 +23,5 @@
     <preference name="AndroidXEnabled" value="true" />
     <preference name="GradlePluginGoogleServicesEnabled" value="true" />
     </platform>
-
+    
 </widget>

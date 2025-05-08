@@ -79,7 +79,7 @@ function isAuthenticated() {
 function checkAuthBeforeAccess() {
   if (!isAuthenticated()) {
     alert(" Accès refusé, veuillez vous connecter !");
-    window.location.href = "login.html"; // Redirige vers la page de login
+    window.location.href = "index.html"; // Redirige vers la page de login
   }
 }
 

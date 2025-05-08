@@ -1,21 +1,32 @@
 async function verify_signature(signatureBase64, message) {
-  console.log(" Vérification de la signature RSA...");
+  console.log("=== Début vérification RSA ===");
+  console.log("Message original:", message);
+  console.log("Type de message:", typeof message);
+  console.log("Signature (base64):", signatureBase64);
 
-  // Clé publique récupérée une seule fois et stocké localement
+  // 1. Récupération clé publique
   const publicKeyPem = await getPublicKeyFromServer();
+  console.log("Clé publique reçue:", publicKeyPem?.substring(0, 50) + "...");
+
+  if (!publicKeyPem) {
+    console.error("Aucune clé publique trouvée");
+    return false;
+  }
 
   try {
-    console.log(" Importation de la clé publique...");
+    // 2. Importation de la clé
     const publicKey = await importPublicKey(publicKeyPem);
+    console.log("Clé publique importée avec succès");
 
-    console.log(" Conversion du message en buffer...");
+    // 3. Conversion des données
     const enc = new TextEncoder();
     const messageBuffer = enc.encode(message);
+    console.log("Message encodé:", messageBuffer);
 
-    console.log(" Conversion de la signature...");
     const signature = base64ToArrayBuffer(signatureBase64);
+    console.log("Signature convertie:", signature);
 
-    console.log(" Vérification en cours...");
+    // 4. Vérification
     const isValid = await crypto.subtle.verify(
       { name: "RSASSA-PKCS1-v1_5" },
       publicKey,
@@ -23,9 +34,10 @@ async function verify_signature(signatureBase64, message) {
       messageBuffer
     );
 
+    console.log("=== Résultat vérification ===", isValid);
     return isValid;
   } catch (error) {
-    console.error(" Erreur lors de la vérification RSA :", error);
+    console.error("Erreur complète:", error);
     return false;
   }
 }
@@ -36,7 +48,7 @@ async function getPublicKeyFromServer() {
   if (cachedKey) return cachedKey;
 
   try {
-    const response = await fetch("https://nomduserv/api/public_key");
+    const response = await fetch("http://localhost:3000/api/events");
     const data = await response.json();
     localStorage.setItem("publicKey", data.publicKey);
     return data.publicKey;

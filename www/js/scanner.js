@@ -37,6 +37,8 @@ function scanQRCode() {
 
   console.log(" Démarrage du scan...");
 
+  document.body.style.backgroundColor = "transparent";
+
   QRScanner.scan(function (err, text) {
     if (err) {
       console.error(" Erreur lors du scan :", err);
@@ -73,30 +75,31 @@ function openInAppBrowser(url) {
 
 // Vérification et validation du billet
 async function handleQRScan(qrContent) {
-  console.log(" QR Code scanné :", qrContent);
+  console.log("Contenu brut du QR:", qrContent);
 
-  // Séparation du JSON et de la signature (QR format: {"uuid":"12345"}:<signature>)
-  const [jsonPart, signature] = qrContent.split(":");
-  if (!jsonPart || !signature) {
-    console.error(" Format du QR code invalide !");
-    alert("QR Code invalide !");
+  // Séparation du JSON et de la signature
+  const [jsonStr, signature] = qrContent.split(":");
+  if (!jsonStr || !signature) {
+    console.error("Format invalide - séparateur ':' manquant");
+    alert("QR Code invalide ! Format attendu: {json}:{signature}");
     return;
   }
 
   try {
-    const billetData = JSON.parse(jsonPart);
-    console.log(" Données du billet :", billetData);
+    // 1. Parse le JSON (en supprimant d'éventuels espaces)
+    const billetData = JSON.parse(jsonStr.trim());
+    console.log("Données parsées:", billetData);
 
-    // Vérifier la signature avec la clé publique
-    const isValid = await verify_signature(signature, jsonPart);
+    // 2. Vérifie la signature avec le JSON original (avant parsing)
+    const isValid = await verify_signature(signature, jsonStr.trim()); // Utilise jsonStr, pas billetData
     if (!isValid) {
-      console.error(" Signature invalide !");
-      alert("Billet invalide !");
+      console.error("Signature invalide !");
+      alert("Billet falsifié !");
       return;
     }
 
-    console.log("✅ Signature valide ! Billet en règle !");
-    alert("Billet authentifié !");
+    console.log("✅ Billet valide !");
+    alert(`Billet valide pour l'événement: ${billetData.event}`);
 
     // Vérifier si on est connecté
     if (navigator.onLine) {
@@ -115,7 +118,7 @@ async function handleQRScan(qrContent) {
 // Envoi au serveur si connecté
 async function envoyerBilletServeur(uuid) {
   try {
-    const response = await fetch("https://nomduserveur/api/validate_billet", {
+    const response = await fetch("http://localhost:3000/api/validate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ uuid }),

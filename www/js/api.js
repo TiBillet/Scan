@@ -27,7 +27,7 @@ async function fetchSignatureFromServer(billetID) {
 
 // MODE LOCAL : Vérifier la signature depuis IndexedDB
 async function fetchSignatureFromLocal(billetID) {
-  console.log("🔍 Recherche du billet en mode hors ligne :", billetID);
+  console.log(" Recherche du billet en mode hors ligne :", billetID);
 
   const billet = await getBilletFromDB(billetID);
   if (billet) {

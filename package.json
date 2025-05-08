@@ -1,6 +1,6 @@
 {
-  "name": "com.scan.qrcode",
-  "displayName": "scanQRcodeApp",
+  "name": "com.example.scanqrcode",
+  "displayName": "scanQRcodeAppdebug",
   "version": "1.0.0",
   "description": "A sample Apache Cordova application that responds to the deviceready event.",
   "main": "index.js",
@@ -13,9 +13,11 @@
   "author": "Apache Cordova Team",
   "license": "Apache-2.0",
   "devDependencies": {
-    "cordova-android": "^13.0.0",
+    "cordova-android": "^14.0.0",
+    "cordova-plugin-advanced-http": "^3.3.1",
     "cordova-plugin-androidx": "^3.0.0",
     "cordova-plugin-androidx-adapter": "^1.1.3",
+    "cordova-plugin-file": "^8.1.3",
     "cordova-plugin-inappbrowser": "^5.0.0",
     "cordova-plugin-qrscanner": "^3.0.1"
   },
@@ -27,7 +29,10 @@
       "cordova-plugin-androidx": {},
       "cordova-plugin-androidx-adapter": {},
       "cordova-plugin-inappbrowser": {},
-      "cordova-plugin-qrscanner": {}
+      "cordova-plugin-qrscanner": {},
+      "cordova-plugin-advanced-http": {
+        "ANDROIDBLACKLISTSECURESOCKETPROTOCOLS": "SSLv3,TLSv1"
+      }
     }
   },
   "dependencies": {
