@@ -6,6 +6,7 @@
     <title>Application de Scan</title>
     <link rel="stylesheet" href="./css/style.css" />
   </head>
+  <script src="js/auth.js"></script>
   <body>
     <header class="bandeau">
       <div class="nom-lieu">Nom du Lieu</div>
@@ -14,12 +15,18 @@
     </header>
     <div class="container">
       <button class="btn">Créer nouveau membre</button>
-      <button class="btn">Scanner une réservation</button>
+      <button class="btn" id="scanBtn">Scanner une réservation</button>
+
       <button class="btn">Points de ventes</button>
       <button class="btn">Recharge carte cashless</button>
     </div>
     <script src="cordova.js"></script>
-    <script src="js/auth.js"></script>
+    <script>
+      document.getElementById("scanBtn").addEventListener("click", function () {
+        window.location.href = "events.html";
+      });
+    </script>
+
     <!-- <script src="js/index.js"></script> -->
   </body>
 </html>

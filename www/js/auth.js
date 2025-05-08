@@ -1,3 +1,21 @@
+console.log("auth.js bien chargé");
+
+document.addEventListener("DOMContentLoaded", function () {
+  const publicPages = ["index.html", "login.html", ""];
+
+  const matches = window.location.href.match(/\/([^/]+\.(html|htm))/i);
+  const currentPage = matches ? matches[1] : "";
+
+  console.log("Page détectée :", currentPage);
+
+  if (!publicPages.includes(currentPage)) {
+    console.log("Page privée, on vérifie l'authentification");
+    checkAuthBeforeAccess();
+  } else {
+    console.log("Page publique, pas de vérification");
+  }
+});
+
 const API_URL = "http://192.168.1.124:3000"; // JSON Server tourne en local
 
 document.getElementById("loginButton").addEventListener("click", login);
@@ -64,22 +82,30 @@ function logout() {
 
 // Vérif user connecté avec JWT valide
 function isAuthenticated() {
-  const token = localStorage.getItem("jwt");
-  if (!token) return false;
-
   try {
+    const token = localStorage.getItem("jwt");
+    if (!token) return false;
+
     const payload = JSON.parse(atob(token.split(".")[1]));
     return payload.exp > Date.now(); // Vérif si le token a expiré
   } catch (error) {
+    console.error("Erreur dans isAuthenticated():", error);
     return false;
   }
 }
 
 // Empêcher l'accès aux pages protégées
 function checkAuthBeforeAccess() {
-  if (!isAuthenticated()) {
-    alert(" Accès refusé, veuillez vous connecter !");
-    window.location.href = "index.html"; // Redirige vers la page de login
+  try {
+    console.log("checkAuthBeforeAccess appelé");
+    if (!isAuthenticated()) {
+      alert("Accès refusé, veuillez vous connecter !");
+      window.location.href = "index.html";
+    } else {
+      console.log("Utilisateur authentifié ✅");
+    }
+  } catch (err) {
+    console.error("Erreur dans checkAuthBeforeAccess:", err);
   }
 }
 
