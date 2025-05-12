@@ -29,10 +29,10 @@
       "cordova-plugin-androidx": {},
       "cordova-plugin-androidx-adapter": {},
       "cordova-plugin-inappbrowser": {},
-      "cordova-plugin-qrscanner": {},
       "cordova-plugin-advanced-http": {
         "ANDROIDBLACKLISTSECURESOCKETPROTOCOLS": "SSLv3,TLSv1"
-      }
+      },
+      "cordova-plugin-qrscanner": {}
     }
   },
   "dependencies": {
