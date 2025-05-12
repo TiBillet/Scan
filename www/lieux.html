@@ -22,6 +22,15 @@
     </div>
     <script src="cordova.js"></script>
     <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker
+          .register("sw.js")
+          .then(() => console.log("[SW] Service worker enregistré"))
+          .catch((err) => console.warn("[SW] Erreur SW", err));
+      }
+    </script>
+
+    <script>
       document.getElementById("scanBtn").addEventListener("click", function () {
         window.location.href = "events.html";
       });

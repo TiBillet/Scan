@@ -14,14 +14,18 @@ document.addEventListener("DOMContentLoaded", function () {
   } else {
     console.log("Page publique, pas de vérification");
   }
+  const loginBtn = document.getElementById("loginButton");
+  if (loginBtn) loginBtn.addEventListener("click", login);
+
+  const logoutBtn = document.getElementById("logoutButton");
+  if (logoutBtn) logoutBtn.addEventListener("click", logout);
+
+  updateUI(); // Appelé après chargement DOM
 });
 
 const API_URL = "http://192.168.1.124:3000"; // JSON Server tourne en local
 
-document.getElementById("loginButton").addEventListener("click", login);
-document.getElementById("logoutButton").addEventListener("click", logout);
-
-// Fonction pour générer faux JWT (à remplacer par un vrai plus tard)
+// Fonction pour générer faux JWT (mettre vrai plus tard)
 function generateFakeJWT(email) {
   const header = btoa(JSON.stringify({ alg: "RS256", typ: "JWT" }));
   const payload = btoa(
@@ -30,7 +34,7 @@ function generateFakeJWT(email) {
       exp: Date.now() + 3600 * 1000, // Expire dans 1h
     })
   );
-  const signature = "FAKE_SIGNATURE"; // Simule une signature RSA
+  const signature = "FAKE_SIGNATURE"; // Simule signature RSA
 
   return `${header}.${payload}.${signature}`;
 }
@@ -58,7 +62,7 @@ async function login() {
     if (users.length > 0) {
       console.log(" Connexion réussie !");
 
-      //   JWT test (remplacé par un vrai plus tard)
+      //   JWT test (remplacé par vrai plus tard)
       const token = generateFakeJWT(email);
       localStorage.setItem("jwt", token);
 
@@ -94,7 +98,7 @@ function isAuthenticated() {
   }
 }
 
-// Empêcher l'accès aux pages protégées
+// Empeche l'accès aux pages protégées
 function checkAuthBeforeAccess() {
   try {
     console.log("checkAuthBeforeAccess appelé");
@@ -112,15 +116,15 @@ function checkAuthBeforeAccess() {
 // Met à jour l'UI en fonction de l'état d'authentification
 function updateUI() {
   const token = localStorage.getItem("jwt");
-  if (isAuthenticated()) {
-    document.getElementById("loginButton").style.display = "none";
-    document.getElementById("logoutButton").style.display = "block";
-    document.getElementById("loginStatus").innerText = "✅ Connecté";
-  } else {
-    document.getElementById("loginButton").style.display = "block";
-    document.getElementById("logoutButton").style.display = "none";
-    document.getElementById("loginStatus").innerText = "❌ Déconnecté";
-  }
+  const isAuth = isAuthenticated();
+
+  const loginBtn = document.getElementById("loginButton");
+  const logoutBtn = document.getElementById("logoutButton");
+  const statusEl = document.getElementById("loginStatus");
+
+  if (loginBtn) loginBtn.style.display = isAuth ? "none" : "block";
+  if (logoutBtn) logoutBtn.style.display = isAuth ? "block" : "none";
+  if (statusEl) statusEl.innerText = isAuth ? "✅ Connecté" : "❌ Déconnecté";
 }
 
 // Vérifier si un utilisateur est déjà connecté au chargement de l'appli

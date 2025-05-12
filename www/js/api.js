@@ -60,7 +60,7 @@ async function verifierBilletLocal(billetID) {
   await fetchSignatureFromLocal(billetID);
 }
 
-// Vérifier si un billet est expiré (plus de 30 jours)
+// Vérifier si billet est expiré 30 jours en exemple la
 function isBilletExpired(dateBillet) {
   const dateNow = new Date();
   const billetDate = new Date(dateBillet);
