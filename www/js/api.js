@@ -1,3 +1,25 @@
+// Récupération des événements et stockage des clés publiques
+async function fetchEvents() {
+  try {
+    const response = await fetch(
+      "https://lespass.demo.tibillet.org/api/events/"
+    );
+    if (!response.ok)
+      throw new Error("Erreur lors de la récupération des événements");
+
+    const events = await response.json();
+    for (const event of events) {
+      console.log("🔑 Clé publique reçue pour event :", event.uuid);
+      await savePublicKey(event.uuid, event.publicKeyPem);
+    }
+
+    return events;
+  } catch (err) {
+    console.error("❌ Impossible de récupérer les événements :", err);
+    return [];
+  }
+}
+
 async function fetchSignatureFromServer(billetID) {
   console.log(" Recherche de la signature en ligne pour le billet :", billetID);
 
@@ -47,6 +69,12 @@ async function fetchSignatureFromLocal(billetID) {
       date: billet.date,
       checksum: billet.checksum, // Ajout du checksum pour éviter la fraude
     });
+
+    const publicKey = await getPublicKey(billet.event);
+    if (!publicKey) {
+      alert("Clé publique manquante pour cet événement !");
+      return;
+    }
 
     verifierSignature(billet.signature, message);
   } else {

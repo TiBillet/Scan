@@ -1,7 +1,11 @@
 document.addEventListener("deviceready", function () {
   console.log("Cordova est prêt !");
   initScanner();
+
   document.getElementById("startScan").addEventListener("click", scanQRCode);
+
+  // Écouteur réseau : sync automatique quand ça revient
+  window.addEventListener("online", envoyerBilletsStockes);
 });
 
 // Initialisation du scanner
@@ -26,7 +30,7 @@ function initScanner() {
   });
 }
 
-//  Fonction de scan QR Code
+// Démarrage du scan
 function scanQRCode() {
   if (typeof QRScanner === "undefined") {
     alert(
@@ -36,7 +40,6 @@ function scanQRCode() {
   }
 
   console.log(" Démarrage du scan...");
-
   document.body.style.backgroundColor = "transparent";
 
   QRScanner.scan(function (err, text) {
@@ -50,9 +53,8 @@ function scanQRCode() {
     }
 
     console.log(" QR Code scanné :", text);
-    alert("QR Code détecté : " + text); // Affiche le texte brut scanné
+    alert("QR Code détecté : " + text);
 
-    // Vérifier si c'est une URL
     if (text.startsWith("http://") || text.startsWith("https://")) {
       console.log(" C'est une URL, ouverture dans InAppBrowser !");
       openInAppBrowser(text);
@@ -68,16 +70,15 @@ function scanQRCode() {
   QRScanner.show();
 }
 
-// Fonction pour ouvrir URL dans le navigateur
+// Ouvre URL externe
 function openInAppBrowser(url) {
   cordova.InAppBrowser.open(url, "_system");
 }
 
-// Vérification et validation du billet
+// Traitement complet du billet
 async function handleQRScan(qrContent) {
   console.log("Contenu brut du QR:", qrContent);
 
-  // Séparation du JSON et de la signature
   const [jsonStr, signature] = qrContent.split(":");
   if (!jsonStr || !signature) {
     console.error("Format invalide - séparateur ':' manquant");
@@ -86,12 +87,22 @@ async function handleQRScan(qrContent) {
   }
 
   try {
-    // 1. Parse le JSON (en supprimant d'éventuels espaces)
     const billetData = JSON.parse(jsonStr.trim());
     console.log("Données parsées:", billetData);
 
-    // 2. Vérifie la signature avec le JSON original (avant parsing)
-    const isValid = await verify_signature(signature, jsonStr.trim()); // Utilise jsonStr, pas billetData
+    // 🧠 Récupère la clé publique locale
+    const publicKey = await getPublicKey(billetData.event);
+    if (!publicKey) {
+      alert("Clé publique manquante pour cet événement !");
+      return;
+    }
+
+    // ✅ Vérifie la signature avec la clé
+    const isValid = await verify_signature(
+      signature,
+      jsonStr.trim(),
+      publicKey
+    );
     if (!isValid) {
       console.error("Signature invalide !");
       alert("Billet falsifié !");
@@ -101,13 +112,17 @@ async function handleQRScan(qrContent) {
     console.log("✅ Billet valide !");
     alert(`Billet valide pour l'événement: ${billetData.event}`);
 
-    // Vérifier si on est connecté
     if (navigator.onLine) {
       console.log(" Envoi au serveur...");
-      envoyerBilletServeur(billetData.uuid);
+      await envoyerBilletServeur(billetData.uuid);
     } else {
       console.log(" Hors ligne, stockage temporaire...");
-      await stockerBilletHorsLigne(billetData.uuid);
+      await saveOfflineTicket(billetData.uuid, signature, billetData.event);
+      alert("Billet stocké en mode hors ligne ✅");
+
+      // (optionnel) debug
+      const enAttente = await getPendingTickets();
+      console.log("Tickets en attente de sync :", enAttente);
     }
   } catch (error) {
     console.error(" Erreur lors du traitement du QR code :", error);
@@ -115,7 +130,7 @@ async function handleQRScan(qrContent) {
   }
 }
 
-// Envoi au serveur si connecté
+// Envoi d’un billet au serveur
 async function envoyerBilletServeur(uuid) {
   try {
     const response = await fetch("http://localhost:3000/api/validate", {
@@ -138,44 +153,19 @@ async function envoyerBilletServeur(uuid) {
   }
 }
 
-// Stockage IndexedDB si hors ligne
-async function stockerBilletHorsLigne(uuid) {
-  const db = await openDB();
-  const tx = db.transaction("billets_offline", "readwrite");
-  await tx.objectStore("billets_offline").put({ uuid, date: new Date() });
-  await tx.done;
-  console.log(" Billet stocké hors ligne.");
-}
-
-// Envoi billets stockés quand connexion rétablie
+// Sync offline → online : on envoie les billets stockés
 async function envoyerBilletsStockes() {
-  const db = await openDB();
-  const billets = await db
-    .transaction("billets_offline")
-    .objectStore("billets_offline")
-    .getAll();
+  try {
+    const billets = await getPendingTickets();
+    console.log("🌀 Tentative de sync des billets offline :", billets);
 
-  for (const billet of billets) {
-    await envoyerBilletServeur(billet.uuid);
-    await db
-      .transaction("billets_offline", "readwrite")
-      .objectStore("billets_offline")
-      .delete(billet.uuid);
+    for (const billet of billets) {
+      await envoyerBilletServeur(billet.uuid);
+      await markTicketAsSynced(billet.uuid); // MAJ du status local
+    }
+
+    console.log("✅ Tous les billets offline ont été synchronisés !");
+  } catch (error) {
+    console.error("Erreur pendant la synchronisation offline :", error);
   }
-
-  console.log(" Tous les billets offline ont été envoyés.");
-}
-
-// Écouteur pour détecter retour réseau
-window.addEventListener("online", envoyerBilletsStockes);
-
-// Initialisation IndexedDB
-async function openDB() {
-  return idb.openDB("BilletsDB", 1, {
-    upgrade(db) {
-      if (!db.objectStoreNames.contains("billets_offline")) {
-        db.createObjectStore("billets_offline", { keyPath: "uuid" });
-      }
-    },
-  });
 }
