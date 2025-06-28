@@ -19,6 +19,9 @@
 
       <button class="btn">Points de ventes</button>
       <button class="btn">Recharge carte cashless</button>
+      <button id="startPairing">🔐 Appairer cet appareil</button>
+
+      <button id="testApi">Tester l'API</button>
     </div>
     <script src="cordova.js"></script>
     <script>
@@ -30,12 +33,24 @@
       }
     </script>
 
+    <!-- <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          for (let registration of registrations) {
+            registration.unregister().then(() => {
+              console.log("✅ SW désinstallé");
+            });
+          }
+        });
+      }
+    </script> -->
+
     <script>
       document.getElementById("scanBtn").addEventListener("click", function () {
         window.location.href = "events.html";
       });
     </script>
 
-    <!-- <script src="js/index.js"></script> -->
+    <script src="js/pairing.js"></script>
   </body>
 </html>

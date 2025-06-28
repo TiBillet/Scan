@@ -47,10 +47,10 @@ async function getPublicKey(event_uuid) {
   return result?.publicKeyPem || null;
 }
 
-// 📲 Enregistrer un ticket scanné offline
+// 📲 Enregistrer un ticket scanné offline (modifié)
 async function saveOfflineTicket(
   uuid,
-  signature,
+  qrcode_data,
   event_uuid,
   status = "pending"
 ) {
@@ -58,7 +58,7 @@ async function saveOfflineTicket(
   const tx = db.transaction("tickets", "readwrite");
   const store = tx.objectStore("tickets");
 
-  await store.put({ uuid, signature, event_uuid, status }); // status = pending | synced | invalid
+  await store.put({ uuid, qrcode_data, event_uuid, status }); // on stocke qrcode_data au lieu de signature
   db.close();
 }
 

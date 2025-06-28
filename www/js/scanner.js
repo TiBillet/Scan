@@ -114,10 +114,10 @@ async function handleQRScan(qrContent) {
 
     if (navigator.onLine) {
       console.log(" Envoi au serveur...");
-      await envoyerBilletServeur(billetData.uuid);
+      await envoyerBilletServeur(qrContent);
     } else {
       console.log(" Hors ligne, stockage temporaire...");
-      await saveOfflineTicket(billetData.uuid, signature, billetData.event);
+      await saveOfflineTicket(billetData.uuid, qrContent, billetData.event);
       alert("Billet stocké en mode hors ligne ✅");
 
       // (optionnel) debug
@@ -131,25 +131,38 @@ async function handleQRScan(qrContent) {
 }
 
 // Envoi d’un billet au serveur
-async function envoyerBilletServeur(uuid) {
+async function envoyerBilletServeur(qrcodeData) {
+  const apiKey = localStorage.getItem("apiKey");
+  if (!apiKey) {
+    alert("Clé API manquante !");
+    return;
+  }
+
   try {
-    const response = await fetch("http://localhost:3000/api/validate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ uuid }),
-    });
+    const response = await fetch(
+      "https://lespass.demo.tibillet.org/scan/ticket",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Api-Key ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          qrcode_data: qrcodeData,
+        }),
+      }
+    );
 
     const result = await response.json();
-    if (result.valid) {
-      console.log(" Billet validé !");
-      alert("Billet valide !");
+
+    if (response.ok && result.valid) {
+      alert("✅ Billet validé par le serveur !");
     } else {
-      console.error(" Billet refusé !");
-      alert("Billet invalide !");
+      alert("❌ Billet refusé : " + (result.message || "invalide"));
     }
   } catch (error) {
-    console.error(" Erreur d'envoi au serveur :", error);
-    alert("Erreur de communication avec le serveur !");
+    console.error("Erreur lors de l'envoi au serveur :", error);
+    alert("Erreur réseau ou serveur !");
   }
 }
 
@@ -160,7 +173,7 @@ async function envoyerBilletsStockes() {
     console.log("🌀 Tentative de sync des billets offline :", billets);
 
     for (const billet of billets) {
-      await envoyerBilletServeur(billet.uuid);
+      await envoyerBilletServeur(billet.qrcode_data);
       await markTicketAsSynced(billet.uuid); // MAJ du status local
     }
 
