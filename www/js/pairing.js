@@ -1,46 +1,46 @@
-// document.getElementById("startPairing").addEventListener("click", () => {
-//   if (!window.QRScanner) {
-//     alert("QRScanner non disponible !");
-//     return;
-//   }
+document.getElementById("startPairing").addEventListener("click", () => {
+  if (!window.QRScanner) {
+    alert("QRScanner non disponible !");
+    return;
+  }
 
-//   QRScanner.prepare(function (err, status) {
-//     if (err || !status.authorized) {
-//       alert("Permission refusée pour la caméra.");
-//       return;
-//     }
+  QRScanner.prepare(function (err, status) {
+    if (err || !status.authorized) {
+      alert("Permission refusée pour la caméra.");
+      return;
+    }
 
-//     QRScanner.scan(async function (err, text) {
-//       QRScanner.hide();
-//       QRScanner.destroy();
+    QRScanner.scan(async function (err, text) {
+      QRScanner.hide();
+      QRScanner.destroy();
 
-//       if (err) {
-//         alert("Erreur lors du scan : " + err.message);
-//         return;
-//       }
+      if (err) {
+        alert("Erreur lors du scan : " + err.message);
+        return;
+      }
 
-//       console.log("QR d'appairage scanné :", text);
+      console.log("QR d'appairage scanné :", text);
 
-//       try {
-//         // const response = await fetch(text); // Lien complet du QR
-//         // const data = await response.json();
-//         cordova.InAppBrowser.open(text, "_system");
+      try {
+        const response = await fetch(text); // Lien complet du QR
+        const data = await response.json();
+        cordova.InAppBrowser.open(text, "_system");
 
-//         if (data.api_key) {
-//           localStorage.setItem("apiKey", data.api_key);
-//           alert("✅ Appairage réussi !");
-//           console.log("Clé API :", data.api_key);
-//         } else {
-//           alert("❌ QR invalide ou clé absente.");
-//         }
-//       } catch (e) {
-//         alert("❌ Erreur de requête : " + e.message);
-//       }
-//     });
+        if (data.api_key) {
+          localStorage.setItem("apiKey", data.api_key);
+          alert("✅ Appairage réussi !");
+          console.log("Clé API :", data.api_key);
+        } else {
+          alert("❌ QR invalide ou clé absente.");
+        }
+      } catch (e) {
+        alert("❌ Erreur de requête : " + e.message);
+      }
+    });
 
-//     QRScanner.show();
-//   });
-// });
+    QRScanner.show();
+  });
+});
 
 // // Exemple de traitement de la réponse d'appairage
 // function enregistrerCleAPI(reponseJson) {
@@ -80,46 +80,47 @@
 // });
 
 // 🔐 Clé API manuelle temporaire (à retirer plus tard)
-if (!localStorage.getItem("apiKey")) {
-  localStorage.setItem("apiKey", "2vWyJ3ot.7k81pzFUKDWl5iT7wU9mdN6QA3FVlph9"); // ⬅️ Remplace par ta vraie clé
-  console.log("🔐 Clé API enregistrée manuellement.");
-}
 
-document.getElementById("startPairing").addEventListener("click", () => {
-  if (!window.QRScanner) {
-    alert("QRScanner non disponible !");
-    return;
-  }
+// if (!localStorage.getItem("apiKey")) {
+//   localStorage.setItem("apiKey", "2vWyJ3ot.7k81pzFUKDWl5iT7wU9mdN6QA3FVlph9"); // ⬅️ Remplace par ta vraie clé
+//   console.log("🔐 Clé API enregistrée manuellement.");
+// }
 
-  QRScanner.prepare(function (err, status) {
-    if (err || !status.authorized) {
-      alert("Permission refusée pour la caméra.");
-      return;
-    }
+// document.getElementById("startPairing").addEventListener("click", () => {
+//   if (!window.QRScanner) {
+//     alert("QRScanner non disponible !");
+//     return;
+//   }
 
-    QRScanner.scan(function (err, text) {
-      QRScanner.hide();
-      QRScanner.destroy();
+//   QRScanner.prepare(function (err, status) {
+//     if (err || !status.authorized) {
+//       alert("Permission refusée pour la caméra.");
+//       return;
+//     }
 
-      if (err) {
-        alert("Erreur lors du scan : " + err.message);
-        return;
-      }
+//     QRScanner.scan(function (err, text) {
+//       QRScanner.hide();
+//       QRScanner.destroy();
 
-      console.log("QR d'appairage scanné :", text);
+//       if (err) {
+//         alert("Erreur lors du scan : " + err.message);
+//         return;
+//       }
 
-      // ✅ On ouvre simplement le lien dans le navigateur externe
-      cordova.InAppBrowser.open(text, "_system");
+//       console.log("QR d'appairage scanné :", text);
 
-      // ✅ Message clair pour l'utilisateur
-      alert(
-        "🔐 Le lien d'appairage s'ouvre dans ton navigateur.\nReviens dans l'application une fois l'appairage terminé."
-      );
-    });
+//       // ✅ On ouvre simplement le lien dans le navigateur externe
+//       cordova.InAppBrowser.open(text, "_system");
 
-    QRScanner.show();
-  });
-});
+//       // ✅ Message clair pour l'utilisateur
+//       alert(
+//         "🔐 Le lien d'appairage s'ouvre dans ton navigateur.\nReviens dans l'application une fois l'appairage terminé."
+//       );
+//     });
+
+//     QRScanner.show();
+//   });
+// });
 
 // VERSION A UTILISER UNE FOIS CORS FIX SANS PLUGIN HTTPS
 
@@ -153,32 +154,33 @@ document.getElementById("startPairing").addEventListener("click", () => {
 
 // VERSION AVEC PLUGIN CROS HTTPS
 
-document.getElementById("testApi").addEventListener("click", async () => {
+document.getElementById("testApi").addEventListener("click", () => {
   const apiKey = localStorage.getItem("apiKey");
   if (!apiKey) return alert("❌ Clé API absente, appairez d'abord.");
 
   cordova.plugin.http.setDataSerializer("json");
 
-  cordova.plugin.http.sendRequest(
-    "https://lespass.demo.tibillet.org/scan/test_api/",
-    {
-      method: "get",
-      headers: {
-        Authorization: `Api-Key ${apiKey}`,
-      },
+  // 🔒 Important pour que HTTPS et les headers soient bien pris en compte
+  cordova.plugin.http.setServerTrustMode(
+    "default",
+    () => {
+      cordova.plugin.http.get(
+        "https://lespass.demo.tibillet.org/scan/test_api/",
+        {}, // Pas de params
+        { Authorization: `Api-Key ${apiKey}` }, // En-têtes
+        function (response) {
+          alert("✅ Test API réussi !");
+          console.log("Réponse :", response);
+        },
+        function (error) {
+          alert("❌ Erreur test API :\n" + JSON.stringify(error));
+          console.error("Erreur test API :", error);
+        }
+      );
     },
-    function (response) {
-      try {
-        const data = JSON.parse(response.data);
-        alert("✅ Test API réussi !");
-        console.log("Test API :", data);
-      } catch (e) {
-        alert("❌ Réponse invalide : " + e.message);
-      }
-    },
-    function (error) {
-      console.error("Erreur test API :", error);
-      alert("❌ Test API échoué : " + error.status + " — " + error.error);
+    function (err) {
+      alert("❌ Erreur TrustMode : " + err);
+      console.error("Erreur setServerTrustMode :", err);
     }
   );
 });
