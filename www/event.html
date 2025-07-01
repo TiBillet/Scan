@@ -11,13 +11,16 @@
     <header class="bandeau">
       <div class="nom-lieu">Nom du Lieu</div>
       <!--appel nom lieu -->
-      <div class="ping">Ping: 43ms</div>
+      <div id="network-status" class="ping">...</div>
     </header>
     <div class="container">
-      <!-- Fetch de l'events -->
+      <div id="event-info"></div>
+      <button onclick="window.location.href='scanner.html'">
+        Aller au scan
+      </button>
     </div>
     <script src="cordova.js"></script>
-
-    <!-- <script src="js/index.js"></script> -->
+    <script src="event.js"></script>
+    <script src="js/index.js"></script>
   </body>
 </html>

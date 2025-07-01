@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
   updateUI(); // Appelé après chargement DOM
 });
 
-const API_URL = "http://192.168.1.124:3000"; // JSON Server tourne en local
+const API_URL = "http://192.168.1.124:3000"; // server local
 
 // Fonction pour générer faux JWT (mettre vrai plus tard)
 function generateFakeJWT(email) {

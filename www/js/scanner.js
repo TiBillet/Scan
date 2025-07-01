@@ -1,10 +1,32 @@
 document.addEventListener("deviceready", function () {
+  // Affiche le nom de l'événement sélectionné
+  const eventUuid = localStorage.getItem("selectedEventUuid");
+  if (eventUuid) {
+    cordova.plugin.http.get(
+      `https://lespass.demo.tibillet.org/api/events/${eventUuid}/`,
+      {},
+      { Accept: "application/json" },
+      function (response) {
+        const event = JSON.parse(response.data);
+        const nameElement = document.getElementById("event-name");
+        if (nameElement) {
+          nameElement.innerText = `${event.name}`;
+        }
+      },
+      function (error) {
+        console.error("Erreur chargement de l'événement :", error);
+        const nameElement = document.getElementById("event-name");
+        if (nameElement) {
+          nameElement.innerText = "❌ Événement introuvable.";
+        }
+      }
+    );
+  }
+
   console.log("Cordova est prêt !");
   initScanner();
 
   document.getElementById("startScan").addEventListener("click", scanQRCode);
-
-  // Écouteur réseau : sync automatique quand ça revient
   window.addEventListener("online", envoyerBilletsStockes);
 });
 
@@ -87,7 +109,8 @@ async function handleQRScan(qrContent) {
   }
 
   try {
-    const billetData = JSON.parse(jsonStr.trim());
+    const decoded = atob(jsonStr.trim());
+    const billetData = JSON.parse(decoded);
     console.log("Données parsées:", billetData);
 
     // 🧠 Récupère la clé publique locale
@@ -154,6 +177,7 @@ async function envoyerBilletServeur(qrcodeData) {
     );
 
     const result = await response.json();
+    console.log("Réponse complète du serveur :", result);
 
     if (response.ok && result.valid) {
       alert("✅ Billet validé par le serveur !");
@@ -165,6 +189,46 @@ async function envoyerBilletServeur(qrcodeData) {
     alert("Erreur réseau ou serveur !");
   }
 }
+
+// document
+//   .getElementById("envoyerBilletServeur")
+//   .addEventListener("click", async () => {
+//     const apiKey = localStorage.getItem("apiKey");
+//     if (!apiKey) {
+//       alert("❌ Clé API absente, appairez d'abord.");
+//       return;
+//     }
+
+//     // Donnée QR code à tester (mise en dur pour test)
+//     const qrcodeData =
+//       "eyJ1dWlkIjogIjYzMjk1Y2FjLTgwY2MtNGFlMS05MmIyLTcxMTk0ZjZkZThmZiJ9:SninEZBpgs8Jn0ZHAtEoC5nXY7TfoGT32urkUsQEo7bSxZ9ZpwHwDEBlU9Mcq9g-5h8HxqIuCDl9eENoMV4utn8rnxDp-ugTOwr6RNwytg8JPN6_0h-LOrPmpDzNvTXSXXcoIAbfZFXzhq8kw6dwzdqE4lbpYHijD087WpUJd6XXtQ76kk7tj349gFVg-ji3rMXg4mVTMDDNVakpH5ZSoC3Obe9YASP4LB9poywkt1g6ja2B5GQY6w4mWFvu-WlHO9FnRaSXJ8blwgD8klJZNLkU_en8MAthBzW9bvAnaKSZmMyNE3GDj2JvuQ0pgu8-gVvrhicAOCXOTM_JyWZdjw==";
+
+//     try {
+//       const response = await fetch(
+//         "https://lespass.demo.tibillet.org/scan/check_ticket/",
+//         {
+//           method: "POST",
+//           headers: {
+//             Authorization: `Api-Key ${apiKey}`,
+//             "Content-Type": "application/json",
+//           },
+//           body: JSON.stringify({ qrcode_data: qrcodeData }),
+//         }
+//       );
+
+//       const result = await response.json();
+//       console.log("Réponse complète du serveur :", result);
+
+//       if (response.ok && result.valid) {
+//         alert("✅ Billet valide !");
+//       } else {
+//         alert("❌ Billet invalide : " + (result.message || "inconnu"));
+//       }
+//     } catch (e) {
+//       console.error("Erreur check_ticket :", e);
+//       alert("❌ Erreur lors de la requête !");
+//     }
+//   });
 
 // Sync offline → online : on envoie les billets stockés
 async function envoyerBilletsStockes() {

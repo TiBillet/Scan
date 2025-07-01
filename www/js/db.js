@@ -36,6 +36,28 @@ async function savePublicKey(event_uuid, publicKeyPem) {
   db.close();
 }
 
+// Récupération des événements et stockage des clés publiques
+async function fetchEvents() {
+  try {
+    const response = await fetch(
+      "https://lespass.demo.tibillet.org/api/events/"
+    );
+    if (!response.ok)
+      throw new Error("Erreur lors de la récupération des événements");
+
+    const events = await response.json();
+    for (const event of events) {
+      console.log("🔑 Clé publique reçue pour event :", event.uuid);
+      await savePublicKey(event.uuid, event.publicKeyPem);
+    }
+
+    return events;
+  } catch (err) {
+    console.error("❌ Impossible de récupérer les événements :", err);
+    return [];
+  }
+}
+
 // 📦 Récupérer la clé publique liée à un événement
 async function getPublicKey(event_uuid) {
   const db = await openDatabase();

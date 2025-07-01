@@ -124,63 +124,62 @@ document.getElementById("startPairing").addEventListener("click", () => {
 
 // VERSION A UTILISER UNE FOIS CORS FIX SANS PLUGIN HTTPS
 
-// // ✅ Bouton test API
-// document.getElementById("testApi").addEventListener("click", async () => {
-//   const apiKey = localStorage.getItem("apiKey");
-//   if (!apiKey) return alert("❌ Clé API absente, appairez d'abord.");
-
-//   try {
-//     const response = await fetch(
-//       "https://lespass.demo.tibillet.org/scan/test_api/",
-//       {
-//         method: "GET",
-//         headers: {
-//           Authorization: `Api-Key ${apiKey}`,
-//         },
-//       }
-//     );
-
-//     if (response.status === 200) {
-//       const data = await response.json();
-//       alert("✅ Test API réussi !");
-//       console.log("Test API :", data);
-//     } else {
-//       alert("❌ Test API échoué : " + response.status);
-//     }
-//   } catch (e) {
-//     alert("❌ Erreur lors du test API : " + e.message);
-//   }
-// });
-
-// VERSION AVEC PLUGIN CROS HTTPS
-
-document.getElementById("testApi").addEventListener("click", () => {
+// ✅ Bouton test API
+document.getElementById("testApi").addEventListener("click", async () => {
   const apiKey = localStorage.getItem("apiKey");
   if (!apiKey) return alert("❌ Clé API absente, appairez d'abord.");
 
-  cordova.plugin.http.setDataSerializer("json");
-
-  // 🔒 Important pour que HTTPS et les headers soient bien pris en compte
-  cordova.plugin.http.setServerTrustMode(
-    "default",
-    () => {
-      cordova.plugin.http.get(
-        "https://lespass.demo.tibillet.org/scan/test_api/",
-        {}, // Pas de params
-        { Authorization: `Api-Key ${apiKey}` }, // En-têtes
-        function (response) {
-          alert("✅ Test API réussi !");
-          console.log("Réponse :", response);
+  try {
+    const response = await fetch(
+      "https://lespass.demo.tibillet.org/scan/check_api_scan/",
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Api-Key ${apiKey}`,
         },
-        function (error) {
-          alert("❌ Erreur test API :\n" + JSON.stringify(error));
-          console.error("Erreur test API :", error);
-        }
-      );
-    },
-    function (err) {
-      alert("❌ Erreur TrustMode : " + err);
-      console.error("Erreur setServerTrustMode :", err);
+      }
+    );
+
+    if (response.status === 200) {
+      const data = await response.json();
+      alert("✅ Test API réussi !");
+      console.log("Test API :", data);
+    } else {
+      alert("❌ Test API échoué : " + response.status);
     }
-  );
+  } catch (e) {
+    alert("❌ Erreur lors du test API : " + e.message);
+  }
 });
+
+// VERSION AVEC PLUGIN CROS HTTPS
+
+// document.getElementById("testApi").addEventListener("click", () => {
+//   const apiKey = localStorage.getItem("apiKey");
+//   if (!apiKey) return alert("❌ Clé API absente, appairez d'abord.");
+
+//   cordova.plugin.http.setDataSerializer("json");
+
+//   cordova.plugin.http.setServerTrustMode(
+//     "default",
+//     () => {
+//       cordova.plugin.http.get(
+//         "https://lespass.demo.tibillet.org/scan/test_api/",
+//         {},
+//         { Authorization: `Api-Key ${apiKey}` },
+//         function (response) {
+//           alert("✅ Test API réussi !");
+//           console.log("Réponse :", response);
+//         },
+//         function (error) {
+//           alert("❌ Erreur test API :\n" + JSON.stringify(error));
+//           console.error("Erreur test API :", error);
+//         }
+//       );
+//     },
+//     function (err) {
+//       alert("❌ Erreur TrustMode : " + err);
+//       console.error("Erreur setServerTrustMode :", err);
+//     }
+//   );
+// });
