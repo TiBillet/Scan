@@ -67,7 +67,7 @@ async function login() {
       localStorage.setItem("jwt", token);
 
       updateUI();
-      alert(" Connexion réussie !");
+
       window.location.href = "lieux.html";
     } else {
       alert(" Identifiants incorrects !");
@@ -81,7 +81,6 @@ async function login() {
 function logout() {
   localStorage.removeItem("jwt");
   updateUI();
-  alert(" Déconnexion réussie !");
 }
 
 // Vérif user connecté avec JWT valide

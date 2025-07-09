@@ -65,7 +65,7 @@
 //   );
 // });
 
-const CACHE_NAME = "cordova-app-v2";
+const CACHE_NAME = "cordova-app-v3";
 const STATIC_ASSETS = [
   "index.html",
   "events.html",
@@ -76,7 +76,6 @@ const STATIC_ASSETS = [
   "js/index.js",
   "js/auth.js",
   "js/scanner.js",
-  "js/api.js",
   "js/rsa.js",
   "img/logo.png",
   "favicon.ico",

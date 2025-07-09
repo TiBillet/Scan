@@ -18,10 +18,13 @@ document.addEventListener("deviceready", () => {
 function displayEvents(events) {
   const container = document.getElementById("events-container");
   container.innerHTML = "";
-  events.forEach((event) => {
-    console.log("event : ", event);
 
+  events.forEach((event) => {
     const eventElement = document.createElement("div");
+    eventElement.classList.add("event-card");
+
+    const date = new Date(event.startDate).toLocaleString();
+
     eventElement.innerHTML = `
         <h2>${event.name}</h2>
         <p>${event.startDate}</p>

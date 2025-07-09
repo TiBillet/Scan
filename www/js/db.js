@@ -26,7 +26,7 @@ function openDatabase() {
   });
 }
 
-// 💾 Enregistrer ou mettre à jour une clé publique pour un événement
+// enregistre ou mettre à jour une clé publique pour un événement
 async function savePublicKey(event_uuid, publicKeyPem) {
   const db = await openDatabase();
   const tx = db.transaction("publicKeys", "readwrite");
@@ -36,7 +36,7 @@ async function savePublicKey(event_uuid, publicKeyPem) {
   db.close();
 }
 
-// Récupération des événements et stockage des clés publiques
+// recup events et stockage des clés publiques
 async function fetchEvents() {
   try {
     const response = await fetch(
@@ -47,18 +47,17 @@ async function fetchEvents() {
 
     const events = await response.json();
     for (const event of events) {
-      console.log("🔑 Clé publique reçue pour event :", event.uuid);
       await savePublicKey(event.uuid, event.publicKeyPem);
     }
 
     return events;
   } catch (err) {
-    console.error("❌ Impossible de récupérer les événements :", err);
+    console.error(" Impossible de récupérer les événements :", err);
     return [];
   }
 }
 
-// 📦 Récupérer la clé publique liée à un événement
+//  Récupérer la clé publique liée à un événement
 async function getPublicKey(event_uuid) {
   const db = await openDatabase();
   const tx = db.transaction("publicKeys", "readonly");
@@ -69,7 +68,7 @@ async function getPublicKey(event_uuid) {
   return result?.publicKeyPem || null;
 }
 
-// 📲 Enregistrer un ticket scanné offline (modifié)
+// save un ticket scanné offline (modifié)
 async function saveOfflineTicket(
   uuid,
   qrcode_data,
@@ -84,7 +83,7 @@ async function saveOfflineTicket(
   db.close();
 }
 
-// 🔍 Récupérer tous les tickets non synchronisés
+// recup tous les tickets non synchronisés
 async function getPendingTickets() {
   const db = await openDatabase();
   const tx = db.transaction("tickets", "readonly");
@@ -105,7 +104,7 @@ async function getPendingTickets() {
   });
 }
 
-// 🧪 Marquer un ticket comme "synced" (utile après POST à l’API)
+// marque un ticket comme "synced" (utile après POST à l’API)
 async function markTicketAsSynced(uuid) {
   const db = await openDatabase();
   const tx = db.transaction("tickets", "readwrite");

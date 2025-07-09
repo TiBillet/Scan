@@ -9,6 +9,7 @@ document.getElementById("startPairing").addEventListener("click", () => {
       alert("Permission refusée pour la caméra.");
       return;
     }
+    document.body.style.backgroundColor = "transparent";
 
     QRScanner.scan(async function (err, text) {
       QRScanner.hide();
@@ -24,12 +25,10 @@ document.getElementById("startPairing").addEventListener("click", () => {
       try {
         const response = await fetch(text); // Lien complet du QR
         const data = await response.json();
-        cordova.InAppBrowser.open(text, "_system");
 
         if (data.api_key) {
           localStorage.setItem("apiKey", data.api_key);
           alert("✅ Appairage réussi !");
-          console.log("Clé API :", data.api_key);
         } else {
           alert("❌ QR invalide ou clé absente.");
         }
