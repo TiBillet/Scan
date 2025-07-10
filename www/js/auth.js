@@ -94,12 +94,10 @@ function isAuthenticated() {
 // Empeche l'accès aux pages protégées
 function checkAuthBeforeAccess() {
   try {
-    console.log("checkAuthBeforeAccess appelé");
+    // console.log("checkAuthBeforeAccess appelé");
     if (!isAuthenticated()) {
       alert("Accès refusé, veuillez vous connecter !");
       window.location.href = "index.html";
-    } else {
-      console.log("Utilisateur authentifié ✅");
     }
   } catch (err) {
     console.error("Erreur dans checkAuthBeforeAccess:", err);

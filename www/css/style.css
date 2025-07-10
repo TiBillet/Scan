@@ -56,6 +56,22 @@ body {
   max-width: 400px;
 }
 
+.btnoff {
+  display: block;
+  width: 100%;
+  padding: 20px;
+  margin: 8px 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #718192;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
 .btn {
   display: block;
   width: 100%;

@@ -33,3 +33,15 @@ if (location.hostname === "localhost") {
     onDeviceReady();
   }, 500);
 }
+
+// let lastScrollTop = 0;
+
+// window.addEventListener("scroll", () => {
+//   const currentScroll = window.scrollY;
+
+//   if (currentScroll < lastScrollTop && currentScroll <= 0) {
+//     location.reload(); // load quand scroll
+//   }
+
+//   lastScrollTop = currentScroll;
+// });
