@@ -1,18 +1,12 @@
-console.log("auth.js bien chargé");
-
 document.addEventListener("DOMContentLoaded", function () {
   const publicPages = ["index.html", "login.html", ""];
 
   const matches = window.location.href.match(/\/([^/]+\.(html|htm))/i);
   const currentPage = matches ? matches[1] : "";
 
-  console.log("Page détectée :", currentPage);
-
   if (!publicPages.includes(currentPage)) {
-    console.log("Page privée, on vérifie l'authentification");
     checkAuthBeforeAccess();
   } else {
-    console.log("Page publique, pas de vérification");
   }
   const loginBtn = document.getElementById("loginButton");
   if (loginBtn) loginBtn.addEventListener("click", login);
@@ -20,7 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const logoutBtn = document.getElementById("logoutButton");
   if (logoutBtn) logoutBtn.addEventListener("click", logout);
 
-  updateUI(); // Appelé après chargement DOM
+  updateUI(); // Appel apres chargement DOM
 });
 
 const API_URL = "http://192.168.1.124:3000"; // server local
@@ -112,7 +106,6 @@ function checkAuthBeforeAccess() {
   }
 }
 
-// Met à jour l'UI en fonction de l'état d'authentification
 function updateUI() {
   const token = localStorage.getItem("jwt");
   const isAuth = isAuthenticated();

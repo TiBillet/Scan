@@ -1,8 +1,8 @@
 // Vérification RSA en local avec clé publique donnée
 async function verify_signature(signatureBase64, message, publicKeyPem) {
-  console.log("=== Début vérification RSA ===");
-  console.log("Message original:", message);
-  console.log("Signature (base64):", signatureBase64);
+  // console.log("=== Début vérification RSA ===");
+  // console.log("Message original:", message);
+  // console.log("Signature (base64):", signatureBase64);
 
   if (!publicKeyPem) {
     console.error("Aucune clé publique fournie !");

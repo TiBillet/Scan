@@ -1,4 +1,4 @@
-// db.js — Gestion locale des clés publiques et billets scannés offline
+// gestion locale des clés publiques et billets scannés offline
 
 function openDatabase() {
   return new Promise((resolve, reject) => {
@@ -46,18 +46,20 @@ async function fetchEvents() {
       throw new Error("Erreur lors de la récupération des événements");
 
     const events = await response.json();
+
     for (const event of events) {
       await savePublicKey(event.uuid, event.publicKeyPem);
     }
 
+    console.log("✅ Clés publiques mises à jour :", events.length);
     return events;
   } catch (err) {
-    console.error(" Impossible de récupérer les événements :", err);
+    console.warn("Offline on garde les clés :", err.message);
     return [];
   }
 }
 
-//  Récupérer la clé publique liée à un événement
+//  recupere la clé publique liée à un événement
 async function getPublicKey(event_uuid) {
   const db = await openDatabase();
   const tx = db.transaction("publicKeys", "readonly");
@@ -68,7 +70,7 @@ async function getPublicKey(event_uuid) {
   return result?.publicKeyPem || null;
 }
 
-// save un ticket scanné offline (modifié)
+// save un ticket scanné offline (
 async function saveOfflineTicket(
   uuid,
   qrcode_data,
@@ -104,7 +106,7 @@ async function getPendingTickets() {
   });
 }
 
-// marque un ticket comme "synced" (utile après POST à l’API)
+// marque un ticket comme synced
 async function markTicketAsSynced(uuid) {
   const db = await openDatabase();
   const tx = db.transaction("tickets", "readwrite");
@@ -112,8 +114,9 @@ async function markTicketAsSynced(uuid) {
 
   const ticket = await store.get(uuid);
   if (ticket) {
-    ticket.status = "synced";
-    await store.put(ticket);
+    const updatedTicket = { ...ticket, status: "synced" };
+    await store.put(updatedTicket);
   }
+
   db.close();
 }

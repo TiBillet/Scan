@@ -1,8 +1,6 @@
 document.addEventListener("deviceready", onDeviceReady, false);
 
 function onDeviceReady() {
-  console.log("✅ App Cordova prête !");
-
   // Si un scanner existe sur la page
   if (typeof initScanner === "function") {
     initScanner();
@@ -30,7 +28,7 @@ function updateNetworkStatus() {
 
 // Fallback localhost
 if (location.hostname === "localhost") {
-  console.log("🌐 Fallback localhost actif.");
+  console.log("Fallback localhost actif.");
   setTimeout(() => {
     onDeviceReady();
   }, 500);

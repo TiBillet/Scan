@@ -23,11 +23,21 @@ document.addEventListener("deviceready", function () {
     );
   }
 
-  console.log("Cordova est prêt !");
   initScanner();
 
+  // relog les événements
   document.getElementById("startScan").addEventListener("click", scanQRCode);
-  window.addEventListener("online", envoyerBilletsStockes);
+
+  //  retour en ligne
+  window.addEventListener("online", () => {
+    console.log("Connexion rétablie, tentative de synchro.");
+    envoyerBilletsStockes();
+  });
+
+  // ✅ Si app en ligne, on sync directement
+  if (navigator.onLine) {
+    envoyerBilletsStockes();
+  }
 });
 
 // Initialisation du scanner
@@ -41,7 +51,7 @@ function initScanner() {
     }
 
     if (status.authorized) {
-      console.log("✅ Permission accordée, QRScanner prêt.");
+      // scan ready
     } else if (status.denied) {
       alert(
         " Permission refusée pour la caméra. Activez-la dans les paramètres."
@@ -61,7 +71,6 @@ function scanQRCode() {
     return;
   }
 
-  console.log(" Démarrage du scan...");
   document.body.style.backgroundColor = "transparent";
 
   QRScanner.scan(function (err, text) {
@@ -80,7 +89,6 @@ function scanQRCode() {
       console.log(" C'est une URL, ouverture dans InAppBrowser !");
       openInAppBrowser(text);
     } else {
-      console.log(" C'est un billet, vérification en cours...");
       handleQRScan(text);
     }
 
@@ -101,6 +109,35 @@ document.addEventListener("deviceready", async () => {
   await fetchEvents();
 });
 
+// async function handleQRScan(qrContent) {
+//   console.log("Contenu brut du QR:", qrContent);
+
+//   const apiKey = localStorage.getItem("apiKey");
+//   if (!apiKey) {
+//     alert("Vous devez d'abord appairer l'appareil !");
+//     return;
+//   }
+
+//   const selectedEventUuid = localStorage.getItem("selectedEventUuid");
+//   if (!selectedEventUuid) {
+//     alert("Aucun événement sélectionné !");
+//     return;
+//   }
+
+//   if (navigator.onLine) {
+//     console.log(" Envoi en ligne...");
+//     await envoyerBilletServeur(qrContent, selectedEventUuid);
+//   } else {
+//     console.log(" Hors ligne, stockage temporaire...");
+//     const uuid = crypto.randomUUID();
+//     await saveOfflineTicket(uuid, qrContent, selectedEventUuid);
+//     alert("Billet stocké en mode hors ligne ✅");
+
+//     const enAttente = await getPendingTickets();
+//     console.log("Tickets en attente de sync :", enAttente);
+//   }
+// }
+
 async function handleQRScan(qrContent) {
   console.log("Contenu brut du QR:", qrContent);
 
@@ -116,25 +153,63 @@ async function handleQRScan(qrContent) {
     return;
   }
 
+  // Si online, comportement existant
   if (navigator.onLine) {
-    console.log(" Envoi en ligne...");
+    console.log(" envoi en ligne..");
     await envoyerBilletServeur(qrContent, selectedEventUuid);
-  } else {
-    console.log(" Hors ligne, stockage temporaire...");
-    const uuid = crypto.randomUUID();
-    await saveOfflineTicket(uuid, qrContent, selectedEventUuid);
-    alert("Billet stocké en mode hors ligne ✅");
-
-    const enAttente = await getPendingTickets();
-    console.log("Tickets en attente de sync :", enAttente);
+    return;
   }
+
+  // Si OFFLINE + vérification RSA locale
+  console.log(" Hors ligne, tentative de vérification locale...");
+
+  const [jsonPart, signatureBase64] = qrContent.split(":");
+  if (!jsonPart || !signatureBase64) {
+    alert("QR code invalide (structure incorrecte)");
+    return;
+  }
+
+  let ticketData;
+  try {
+    const decodedJson = atob(jsonPart);
+    ticketData = JSON.parse(decodedJson);
+  } catch (e) {
+    alert("QR code invalide (JSON mal formé)");
+    return;
+  }
+
+  const uuid = ticketData.uuid || crypto.randomUUID();
+
+  // Récupère la clé publique de l'événement
+  const publicKeyPem = await getPublicKey(selectedEventUuid);
+  if (!publicKeyPem) {
+    alert("Clé publique introuvable pour l'événement.");
+    return;
+  }
+
+  const isValid = await verify_signature(
+    signatureBase64,
+    jsonPart,
+    publicKeyPem
+  );
+
+  if (isValid) {
+    alert("✅ Billet conforme, scanné avec succès !");
+  } else {
+    alert("❌ Signature invalide. Billet non conforme.");
+  }
+
+  // On stock de toute façon le billet
+  await saveOfflineTicket(uuid, qrContent, selectedEventUuid);
+  const enAttente = await getPendingTickets();
+  console.log("billet en attente de sync :", enAttente);
 }
 
 // envoi billet serveur
 async function envoyerBilletServeur(qrcodeData, event_uuid = null) {
   const apiKey = localStorage.getItem("apiKey");
   if (!apiKey) {
-    alert("Clé API manquante !");
+    alert("Vous devez appairer l'appareil au préalable !");
     return;
   }
 
@@ -194,15 +269,20 @@ async function envoyerBilletServeur(qrcodeData, event_uuid = null) {
   }
 }
 
-// Sync offline → online : on envoie les billets stockés
+// Sync offline - online envoie des billets stockés
 async function envoyerBilletsStockes() {
   try {
     const billets = await getPendingTickets();
-    console.log("🌀 Tentative de sync des billets offline :", billets);
+    console.log("essaie de sync des billets offline :", billets);
 
     for (const billet of billets) {
-      await envoyerBilletServeur(billet.qrcode_data);
-      await markTicketAsSynced(billet.uuid); // MAJ du status local
+      if (!billet.event_uuid) {
+        console.warn(" Billet effacé (quand gardé en stock offline) :", billet);
+        continue;
+      }
+
+      await envoyerBilletServeur(billet.qrcode_data, billet.event_uuid);
+      await markTicketAsSynced(billet.uuid);
     }
 
     console.log("✅ Tous les billets offline ont été synchronisés !");
