@@ -2,7 +2,9 @@ document.addEventListener("deviceready", fetchSelectedEvent);
 
 function fetchSelectedEvent() {
   const uuid = localStorage.getItem("selectedEventUuid");
-  if (!uuid) {
+  const baseUrl = localStorage.getItem("apiBaseUrl");
+
+  if (!uuid || !baseUrl) {
     document.getElementById("event-info").innerText =
       "Aucun événement sélectionné.";
     return;
@@ -10,7 +12,7 @@ function fetchSelectedEvent() {
 
   if (window.cordova && cordova.plugin && cordova.plugin.http) {
     cordova.plugin.http.get(
-      `https://lespass.demo.tibillet.org/api/events/${uuid}/`,
+      `${baseUrl}/api/events/${uuid}/`,
       {},
       { Accept: "application/json" },
       function (response) {

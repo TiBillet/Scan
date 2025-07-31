@@ -3,30 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QR Code Scanner</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <title>Application de Scan</title>
+    <link rel="stylesheet" href="./css/style.css" />
   </head>
   <body>
-    <h1>Connexion</h1>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Mot de passe" />
-    <button id="loginButton">Se connecter</button>
-    <button id="logoutButton" style="display: none">Se déconnecter</button>
-    <p id="loginStatus"></p>
+    <header class="bandeau">
+      <div class="nom-lieu">Nom du Lieu</div>
+      <!--appel nom lieu -->
+      <div id="network-status" class="ping">...</div>
+    </header>
+    <div class="container">
+      <button id="startApp">Démarrer l'application</button>
+    </div>
 
-    <script src="cordova.js"></script>
     <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker
-          .register("sw.js")
-          .then(() => console.log("[SW] Service worker enregistré"))
-          .catch((err) => console.warn("[SW] Erreur SW", err));
-      }
+      document.getElementById("startApp").addEventListener("click", () => {
+        const apiKey = localStorage.getItem("apiKey");
+
+        if (apiKey) {
+          window.location.href = "lieux.html";
+        } else {
+          window.location.href = "pairing.html";
+        }
+      });
     </script>
-
-    <!-- supprimer sw pour contourner cors -->
-
-    <!-- <script>
+    <script>
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.getRegistrations().then((registrations) => {
           for (let registration of registrations) {
@@ -35,12 +36,15 @@
             });
           }
         });
+        caches.keys().then(function (names) {
+          for (let name of names) {
+            caches.delete(name);
+          }
+        });
       }
-    </script> -->
+    </script>
 
-    <script src="js/auth.js"></script>
-    <script src="js/db.js"></script>
-
-    <!-- <script src="js/index.js"></script> -->
+    <script src="cordova.js"></script>
+    <script src="js/index.js"></script>
   </body>
 </html>

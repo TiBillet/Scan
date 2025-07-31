@@ -1,6 +1,7 @@
 document.addEventListener("deviceready", onDeviceReady, false);
 
 function onDeviceReady() {
+  // afficherNomLieu();
   // Si un scanner existe sur la page
   if (typeof initScanner === "function") {
     initScanner();
@@ -34,14 +35,37 @@ if (location.hostname === "localhost") {
   }, 500);
 }
 
-// let lastScrollTop = 0;
+document.addEventListener("deviceready", function () {
+  if (navigator.splashscreen) {
+    navigator.splashscreen.hide();
+  }
+});
 
-// window.addEventListener("scroll", () => {
-//   const currentScroll = window.scrollY;
+// function afficherNomLieu() {
+//   const uuid = localStorage.getItem("selectedEventUuid");
+//   const baseUrl = localStorage.getItem("apiBaseUrl");
 
-//   if (currentScroll < lastScrollTop && currentScroll <= 0) {
-//     location.reload(); // load quand scroll
-//   }
+//   if (!uuid || !baseUrl) return;
 
-//   lastScrollTop = currentScroll;
-// });
+//   const container = document.querySelector(".nom-lieu");
+//   if (!container) return;
+
+//   cordova.plugin.http.get(
+//     `${baseUrl}/api/events/${uuid}/`,
+//     {},
+//     { Accept: "application/json" },
+//     function (response) {
+//       try {
+//         const data = JSON.parse(response.data);
+//         if (data.name) {
+//           container.textContent = data.name;
+//         }
+//       } catch (e) {
+//         console.warn("Erreur parsing JSON event :", e);
+//       }
+//     },
+//     function (error) {
+//       console.warn("Erreur chargement nom du lieu :", error);
+//     }
+//   );
+// }

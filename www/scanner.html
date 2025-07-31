@@ -6,7 +6,6 @@
     <title>QR Code Scanner</title>
     <link rel="stylesheet" href="css/style.css" />
   </head>
-  <script src="js/auth.js"></script>
   <body>
     <header class="bandeau">
       <div class="nom-lieu">Nom du Lieu</div>
@@ -21,10 +20,25 @@
       <h3 id="event-name">Chargement de l'événement...</h3>
     </div>
 
+    <div id="scanner-frame" class="hidden">
+      <div class="corner top-left"></div>
+      <div class="corner top-right"></div>
+      <div class="corner bottom-left"></div>
+      <div class="corner bottom-right"></div>
+    </div>
+
     <script src="cordova.js"></script>
     <script src="js/index.js"></script>
     <script src="js/db.js"></script>
     <script src="js/rsa.js"></script>
     <script src="js/scanner.js"></script>
+
+    <div id="scan-feedback" class="hidden">
+      <div id="scan-icon"></div>
+      <p id="scan-message"></p>
+    </div>
+
+    <audio id="sound-success" src="sounds/success.mp3" preload="auto"></audio>
+    <audio id="sound-error" src="sounds/error.mp3" preload="auto"></audio>
   </body>
 </html>

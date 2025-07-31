@@ -1,9 +1,10 @@
 document.addEventListener("deviceready", function () {
-  // Affiche le nom de l'événement sélectionné
+  const apiBaseUrl = localStorage.getItem("apiBaseUrl");
   const eventUuid = localStorage.getItem("selectedEventUuid");
-  if (eventUuid) {
+
+  if (eventUuid && apiBaseUrl) {
     cordova.plugin.http.get(
-      `https://lespass.demo.tibillet.org/api/events/${eventUuid}/`,
+      `${apiBaseUrl}/api/events/${eventUuid}/`,
       {},
       { Accept: "application/json" },
       function (response) {
@@ -25,16 +26,13 @@ document.addEventListener("deviceready", function () {
 
   initScanner();
 
-  // relog les événements
   document.getElementById("startScan").addEventListener("click", scanQRCode);
 
-  //  retour en ligne
   window.addEventListener("online", () => {
     console.log("Connexion rétablie, tentative de synchro.");
     envoyerBilletsStockes();
   });
 
-  // ✅ Si app en ligne, on sync directement
   if (navigator.onLine) {
     envoyerBilletsStockes();
   }
@@ -72,6 +70,7 @@ function scanQRCode() {
   }
 
   document.body.style.backgroundColor = "transparent";
+  showScannerFrame();
 
   QRScanner.scan(function (err, text) {
     if (err) {
@@ -83,8 +82,6 @@ function scanQRCode() {
       return;
     }
 
-    console.log(" QR Code scanné :", text);
-
     if (text.startsWith("http://") || text.startsWith("https://")) {
       console.log(" C'est une URL, ouverture dans InAppBrowser !");
       openInAppBrowser(text);
@@ -94,6 +91,7 @@ function scanQRCode() {
 
     QRScanner.hide();
     QRScanner.destroy();
+    hideScannerFrame();
   });
 
   QRScanner.show();
@@ -108,35 +106,6 @@ document.addEventListener("deviceready", async () => {
   console.log("Initialisation des clés publiques...");
   await fetchEvents();
 });
-
-// async function handleQRScan(qrContent) {
-//   console.log("Contenu brut du QR:", qrContent);
-
-//   const apiKey = localStorage.getItem("apiKey");
-//   if (!apiKey) {
-//     alert("Vous devez d'abord appairer l'appareil !");
-//     return;
-//   }
-
-//   const selectedEventUuid = localStorage.getItem("selectedEventUuid");
-//   if (!selectedEventUuid) {
-//     alert("Aucun événement sélectionné !");
-//     return;
-//   }
-
-//   if (navigator.onLine) {
-//     console.log(" Envoi en ligne...");
-//     await envoyerBilletServeur(qrContent, selectedEventUuid);
-//   } else {
-//     console.log(" Hors ligne, stockage temporaire...");
-//     const uuid = crypto.randomUUID();
-//     await saveOfflineTicket(uuid, qrContent, selectedEventUuid);
-//     alert("Billet stocké en mode hors ligne ✅");
-
-//     const enAttente = await getPendingTickets();
-//     console.log("Tickets en attente de sync :", enAttente);
-//   }
-// }
 
 async function handleQRScan(qrContent) {
   console.log("Contenu brut du QR:", qrContent);
@@ -194,9 +163,9 @@ async function handleQRScan(qrContent) {
   );
 
   if (isValid) {
-    alert("✅ Billet conforme, scanné avec succès !");
+    afficherFeedbackScan("success");
   } else {
-    alert("❌ Signature invalide. Billet non conforme.");
+    afficherFeedbackScan("error", "Signature invalide. Billet non conforme.");
   }
 
   // On stock de toute façon le billet
@@ -208,61 +177,69 @@ async function handleQRScan(qrContent) {
 // envoi billet serveur
 async function envoyerBilletServeur(qrcodeData, event_uuid = null) {
   const apiKey = localStorage.getItem("apiKey");
-  if (!apiKey) {
-    alert("Vous devez appairer l'appareil au préalable !");
+  const apiBaseUrl = localStorage.getItem("apiBaseUrl");
+
+  if (!apiKey || !apiBaseUrl) {
+    alert("Appairage nécessaire (clé API ou URL manquante).");
     return;
   }
 
   try {
-    const response = await fetch(
-      "https://lespass.demo.tibillet.org/scan/ticket/",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Api-Key ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          qrcode_data: qrcodeData,
-          ...(event_uuid && { event_uuid }),
-        }),
-      }
-    );
+    const response = await fetch(`${apiBaseUrl}/scan/ticket/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Api-Key ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        qrcode_data: qrcodeData,
+        ...(event_uuid && { event_uuid }),
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error("❌ Erreur HTTP :", response.status, errorText);
 
       if (response.status === 406 && errorText.includes("Event error")) {
-        alert("❌ Le billet ne correspond pas à l’événement sélectionné.");
+        afficherFeedbackScan(
+          "error",
+          "❌ Le billet ne correspond pas à l’événement sélectionné."
+        );
       } else if (
         response.status === 500 &&
         errorText.includes("n’est pas un UUID valide")
       ) {
-        alert("❌ Billet non conforme.");
+        afficherFeedbackScan("error", "❌ Billet non conforme.");
       } else if (response.status === 403) {
-        alert("❌ Clé API invalide ou non autorisée.");
+        afficherFeedbackScan("error", "❌ Clé API invalide ou non autorisée.");
       } else {
-        alert("❌ Erreur serveur : " + response.status);
+        afficherFeedbackScan("error", "❌ Erreur serveur : " + response.status);
       }
 
-      return;
+      return setTimeout(scanQRCode, 1000);
     }
 
     const result = await response.json();
     console.log("Réponse complète du serveur :", result);
 
     if (result.success) {
-      alert("✅ Billet conforme, scanné avec succès !");
+      afficherFeedbackScan("success");
     } else if (result.error === "Event error") {
-      alert("❌ Le billet ne correspond pas à l’événement sélectionné.");
+      afficherFeedbackScan(
+        "error",
+        "❌ Le billet ne correspond pas à l’événement sélectionné."
+      );
     } else if (result.message === "Ticket already scanned") {
-      alert("❌ Ce billet a déjà été scanné !");
+      afficherFeedbackScan("error", "❌ Ce billet a déjà été scanné !");
     } else {
-      alert(
+      afficherFeedbackScan(
+        "error",
         "❌ Billet refusé : " + (result.message || result.error || "invalide")
       );
     }
+
+    return setTimeout(scanQRCode, 1000);
   } catch (error) {
     console.error("Erreur lors de l'envoi au serveur :", error);
     alert("Erreur réseau ou serveur !");
@@ -289,4 +266,43 @@ async function envoyerBilletsStockes() {
   } catch (error) {
     console.error("Erreur pendant la synchronisation offline :", error);
   }
+}
+
+function afficherFeedbackScan(type, message) {
+  const box = document.getElementById("scan-feedback");
+  const icon = document.getElementById("scan-icon");
+  const msg = document.getElementById("scan-message");
+  const soundSuccess = document.getElementById("sound-success");
+  const soundError = document.getElementById("sound-error");
+
+  if (!box || !icon || !msg) return;
+
+  box.classList.remove("hidden", "success", "error");
+  box.classList.add(type);
+
+  if (type === "success") {
+    icon.textContent = "✅";
+    soundSuccess.play();
+  } else {
+    icon.textContent = "❌";
+    soundError.play();
+  }
+
+  msg.textContent = message;
+
+  const hide = () => {
+    box.classList.add("hidden");
+    box.removeEventListener("click", hide);
+  };
+  setTimeout(() => {
+    box.classList.add("hidden");
+  }, 2000);
+}
+
+function showScannerFrame() {
+  document.getElementById("scanner-frame")?.classList.remove("hidden");
+}
+
+function hideScannerFrame() {
+  document.getElementById("scanner-frame")?.classList.add("hidden");
 }

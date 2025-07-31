@@ -1,42 +1,82 @@
-document.getElementById("startPairing").addEventListener("click", () => {
-  if (!window.QRScanner) {
-    alert("QRScanner non disponible !");
-    return;
-  }
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("startPairing");
+  if (!btn) return;
 
-  QRScanner.prepare(function (err, status) {
-    if (err || !status.authorized) {
-      alert("Permission refusée pour la caméra.");
+  btn.addEventListener("click", () => {
+    if (!window.QRScanner) {
+      alert("QRScanner non disponible !");
       return;
     }
-    document.body.style.backgroundColor = "transparent";
 
-    QRScanner.scan(async function (err, text) {
-      QRScanner.hide();
-      QRScanner.destroy();
+    btn.classList.add("hidden");
 
-      if (err) {
-        alert("Erreur lors du scan : " + err.message);
+    QRScanner.prepare(function (err, status) {
+      if (err || !status.authorized) {
+        alert("Permission refusée pour la caméra.");
         return;
       }
 
-      console.log("QR d'appairage scanné :", text);
+      document.body.style.backgroundColor = "transparent";
 
-      try {
-        const response = await fetch(text);
-        const data = await response.json();
+      showScannerFrame();
 
-        if (data.api_key) {
-          localStorage.setItem("apiKey", data.api_key);
-          alert("✅ Appairage réussi !");
-        } else {
-          alert("❌ QR invalide ou clé absente.");
+      QRScanner.scan(async function (err, text) {
+        QRScanner.hide();
+        QRScanner.destroy();
+
+        hideScannerFrame();
+
+        if (err) {
+          alert("Erreur lors du scan : " + err.message);
+          return;
         }
-      } catch (e) {
-        alert("❌ Erreur de requête : " + e.message);
-      }
-    });
 
-    QRScanner.show();
+        console.log("QR d'appairage scanné :", text);
+
+        const baseUrl = text.split("/scan/")[0];
+        localStorage.setItem("apiBaseUrl", baseUrl);
+
+        cordova.plugin.http.get(
+          text,
+          {},
+          { Accept: "application/json" },
+          function (response) {
+            try {
+              const data = JSON.parse(response.data);
+              localStorage.setItem(
+                "lastPairingResponse",
+                JSON.stringify(data, null, 2)
+              );
+
+              if (data.api_key) {
+                localStorage.setItem("apiKey", data.api_key);
+                alert("✅ Appairage réussi !");
+                window.location.href = "lieux.html";
+              } else {
+                alert("❌ QR invalide ou clé absente.");
+              }
+            } catch (e) {
+              alert("❌ Erreur de requête : " + e.message);
+            }
+          },
+          function (error) {
+            alert(
+              "❌ Erreur réseau : " +
+                (error.error || error.status || "inconnue")
+            );
+          }
+        );
+      });
+
+      QRScanner.show();
+    });
   });
 });
+
+function showScannerFrame() {
+  document.getElementById("scanner-frame")?.classList.remove("hidden");
+}
+
+function hideScannerFrame() {
+  document.getElementById("scanner-frame")?.classList.add("hidden");
+}

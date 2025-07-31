@@ -1,6 +1,8 @@
 document.addEventListener("deviceready", () => {
+  const baseUrl = localStorage.getItem("apiBaseUrl");
   cordova.plugin.http.get(
-    "https://lespass.demo.tibillet.org/api/events/",
+    `${baseUrl}/api/events/`,
+
     {},
     { Accept: "application/json" },
     function (response) {
@@ -28,9 +30,7 @@ function displayEvents(events) {
     eventElement.innerHTML = `
         <h2>${event.name}</h2>
         <p>${event.startDate}</p>
-        <p>${event.description}</p>
-        <a href="${event.url}" target="_blank">Lien</a>
-        <hr>
+
       `;
 
     eventElement.addEventListener("click", () => {

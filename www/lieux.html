@@ -6,7 +6,6 @@
     <title>Application de Scan</title>
     <link rel="stylesheet" href="./css/style.css" />
   </head>
-  <script src="js/auth.js"></script>
   <body>
     <header class="bandeau">
       <div class="nom-lieu">Nom du Lieu</div>
@@ -19,19 +18,16 @@
 
       <button class="btnoff">Points de ventes</button>
       <button class="btnoff">Recharge carte cashless</button>
-      <button id="startPairing">🔐 Appairer cet appareil</button>
-
-      <button id="testApi">Tester l'API</button>
     </div>
     <script src="cordova.js"></script>
-    <script>
+    <!-- <script>
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker
           .register("sw.js")
           .then(() => console.log("[SW] Service worker enregistré"))
           .catch((err) => console.warn("[SW] Erreur SW", err));
       }
-    </script>
+    </script> -->
 
     <!-- <script>
       if ("serviceWorker" in navigator) {
