@@ -27,11 +27,24 @@
       <div class="corner bottom-right"></div>
     </div>
 
+    <button id="btn-show-reservations">📋 Liste des billets</button>
+
+    <div id="reservation-panel" style="display: none">
+      <input
+        type="text"
+        id="search-reservation"
+        placeholder="🔍 Nom, prénom ou email"
+      />
+
+      <ul id="reservation-list"></ul>
+    </div>
+
     <script src="cordova.js"></script>
     <script src="js/index.js"></script>
     <script src="js/db.js"></script>
     <script src="js/rsa.js"></script>
     <script src="js/scanner.js"></script>
+    <script src="js/list.js"></script>
 
     <div id="scan-feedback" class="hidden">
       <div id="scan-icon"></div>
