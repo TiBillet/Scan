@@ -30,29 +30,87 @@ document.addEventListener("deviceready", function () {
     });
   }
 
-  // 🔄 Exemple de chargement des billets
   function fetchReservations() {
-    const apiKey = localStorage.getItem("apiKey");
-    const eventUuid = localStorage.getItem("selectedEventUuid");
+  const apiKey = localStorage.getItem("apiKey");
+  const eventUuid = localStorage.getItem("selectedEventUuid");
+  const apiBaseUrl = localStorage.getItem("apiBaseUrl");
 
-    cordova.plugin.http.get(
-      `https://lespass.demo.tibillet.org/api/events/${eventUuid}/reservations/`,
-      {},
-      { Authorization: `Api-Key ${apiKey}`, Accept: "application/json" },
-      function (response) {
-        const data = JSON.parse(response.data);
-        reservations = data.map((ticket) => ({
-          name: ticket.full_name || "Sans nom",
-          email: ticket.email || "Aucune adresse",
-          uuid: ticket.uuid,
-        }));
-        console.log("Réservations chargées :", reservations);
-      },
-      function (error) {
-        console.error("Erreur de chargement billets", error);
-      }
-    );
+  if (!apiKey || !eventUuid || !apiBaseUrl) {
+    console.error("Clé API, UUID d'événement ou API base URL manquant");
+    return;
   }
 
+  const url = `${apiBaseUrl}/api/events/${eventUuid}/reservations/`;
+
+  cordova.plugin.http.get(
+    url,
+    {},
+    {
+      Authorization: `Api-Key ${apiKey}`,
+      Accept: "application/json",
+    },
+    function (response) {
+      const data = JSON.parse(response.data);
+      reservations = data.map((ticket) => ({
+        name: ticket.full_name || "Sans nom",
+        email: ticket.email || "Aucune adresse",
+        uuid: ticket.uuid,
+      }));
+      console.log("Réservations chargées :", reservations);
+    },
+    function (error) {
+      console.error("Erreur de chargement billets", error);
+    }
+  );
+}
+
+
   fetchReservations(); // Appelé dès le lancement
+});
+
+// test dummy 
+
+const dummyReservations = [
+  {
+    name: "Alice Dupont",
+    email: "alice@mail.com",
+    uuid: "uuid-1"
+  },
+  {
+    name: "Bob Martin",
+    email: "bob@pro.com",
+    uuid: "uuid-2"
+  },
+  {
+    name: "Chloé Tixier",
+    email: "chloe@demo.fr",
+    uuid: "uuid-3"
+  }
+];
+
+document.addEventListener("DOMContentLoaded", function () {
+  const listElement = document.getElementById("reservation-list");
+  const searchInput = document.getElementById("search");
+
+  let reservations = dummyReservations;
+
+  function renderList(data) {
+    listElement.innerHTML = "";
+    data.forEach((r) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${r.name}</strong><div class="email">${r.email}</div>`;
+      listElement.appendChild(li);
+    });
+  }
+
+  searchInput.addEventListener("input", () => {
+    const term = searchInput.value.toLowerCase();
+    const filtered = reservations.filter((r) =>
+      r.name.toLowerCase().includes(term) ||
+      r.email.toLowerCase().includes(term)
+    );
+    renderList(filtered);
+  });
+
+  renderList(reservations);
 });
