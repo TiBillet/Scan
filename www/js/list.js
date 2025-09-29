@@ -1,116 +1,106 @@
 document.addEventListener("deviceready", function () {
-  const showBtn = document.getElementById("btn-show-reservations");
-  const panel = document.getElementById("reservation-panel");
   const list = document.getElementById("reservation-list");
-  const search = document.getElementById("search-reservation");
+  const search = document.getElementById("search");
 
-  let reservations = []; // Contiendra les billets
+  console.log("✅ Script list.js chargé");
 
-  showBtn.addEventListener("click", () => {
-    panel.style.display = "block";
-    renderList(reservations);
-  });
-
-  search.addEventListener("input", () => {
-    const term = search.value.toLowerCase();
-    const filtered = reservations.filter(
-      (item) =>
-        item.name.toLowerCase().includes(term) ||
-        item.email.toLowerCase().includes(term)
-    );
-    renderList(filtered);
-  });
-
+  // Affiche la liste des billets
   function renderList(data) {
     list.innerHTML = "";
+
+    if (!data.length) {
+      const li = document.createElement("li");
+      li.textContent = "Aucun résultat trouvé.";
+      list.appendChild(li);
+      return;
+    }
+
     data.forEach((res) => {
       const li = document.createElement("li");
-      li.textContent = `${res.name} – ${res.email}`;
+      li.innerHTML = `
+    <strong>${res.name}</strong>
+    <div class="email">${res.email}</div>
+    <div class="status">${res.status}</div>
+    `;
+
       list.appendChild(li);
     });
   }
 
-  function fetchReservations() {
-  const apiKey = localStorage.getItem("apiKey");
-  const eventUuid = localStorage.getItem("selectedEventUuid");
-  const apiBaseUrl = localStorage.getItem("apiBaseUrl");
+  // Effectue la requête API
+  function fetchReservations(term = "*") {
+    const apiKey = localStorage.getItem("apiKey");
+    const apiBaseUrl = localStorage.getItem("apiBaseUrl");
+    const eventUuid = localStorage.getItem("selectedEventUuid");
 
-  if (!apiKey || !eventUuid || !apiBaseUrl) {
-    console.error("Clé API, UUID d'événement ou API base URL manquant");
-    return;
-  }
-
-  const url = `${apiBaseUrl}/api/events/${eventUuid}/reservations/`;
-
-  cordova.plugin.http.get(
-    url,
-    {},
-    {
-      Authorization: `Api-Key ${apiKey}`,
-      Accept: "application/json",
-    },
-    function (response) {
-      const data = JSON.parse(response.data);
-      reservations = data.map((ticket) => ({
-        name: ticket.full_name || "Sans nom",
-        email: ticket.email || "Aucune adresse",
-        uuid: ticket.uuid,
-      }));
-      console.log("Réservations chargées :", reservations);
-    },
-    function (error) {
-      console.error("Erreur de chargement billets", error);
+    if (!apiKey || !apiBaseUrl || !eventUuid) {
+      console.error("❌ Clé API, URL ou UUID événement manquant");
+      return;
     }
-  );
-}
 
+    const url = `${apiBaseUrl}/scan/search_ticket/`;
 
-  fetchReservations(); // Appelé dès le lancement
-});
+    const headers = {
+      Authorization: `Api-Key ${apiKey}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    };
 
-// test dummy 
+    const searchString = term.trim();
+    if (!searchString) {
+      console.warn("⚠️ Aucun terme de recherche — remplacement par '*'");
+    }
 
-const dummyReservations = [
-  {
-    name: "Alice Dupont",
-    email: "alice@mail.com",
-    uuid: "uuid-1"
-  },
-  {
-    name: "Bob Martin",
-    email: "bob@pro.com",
-    uuid: "uuid-2"
-  },
-  {
-    name: "Chloé Tixier",
-    email: "chloe@demo.fr",
-    uuid: "uuid-3"
-  }
-];
+    const body = {
+      search: searchString || "*", // 🔥 fallback pour éviter erreur 400
+      event_uuid: eventUuid,
+    };
 
-document.addEventListener("DOMContentLoaded", function () {
-  const listElement = document.getElementById("reservation-list");
-  const searchInput = document.getElementById("search");
+    console.log("📡 Envoi requête pour :", body.search);
 
-  let reservations = dummyReservations;
+    cordova.plugin.http.post(
+      url,
+      body,
+      headers,
+      function (response) {
+        try {
+          const data = JSON.parse(response.data);
+          console.log("📥 Données reçues :", data);
 
-  function renderList(data) {
-    listElement.innerHTML = "";
-    data.forEach((r) => {
-      const li = document.createElement("li");
-      li.innerHTML = `<strong>${r.name}</strong><div class="email">${r.email}</div>`;
-      listElement.appendChild(li);
-    });
-  }
+          if (!Array.isArray(data.results)) {
+            console.error("❌ Format inattendu (results manquant)", data);
+            renderList([]);
+            return;
+          }
 
-  searchInput.addEventListener("input", () => {
-    const term = searchInput.value.toLowerCase();
-    const filtered = reservations.filter((r) =>
-      r.name.toLowerCase().includes(term) ||
-      r.email.toLowerCase().includes(term)
+          const results = data.results.map((ticket) => ({
+            name:
+              ticket.first_name || ticket.last_name
+                ? `${ticket.first_name || ""} ${ticket.last_name || ""}`.trim()
+                : ticket.email || "(Nom inconnu)",
+            email: ticket.email || "—",
+            status: ticket.status || "Statut inconnu",
+          }));
+
+          renderList(results);
+        } catch (e) {
+          console.error("❌ Erreur parsing :", e);
+          renderList([]);
+        }
+      },
+      function (error) {
+        console.error("❌ Erreur API search_ticket :", error);
+        renderList([]);
+      }
     );
-    renderList(filtered);
+  }
+
+  // Recherche live sur input
+  search.addEventListener("input", () => {
+    const term = search.value.trim();
+    fetchReservations(term);
   });
 
-  renderList(reservations);
+  // Chargement initial — recherche vide
+  fetchReservations("*"); // Tu peux remplacer "" par "*" si ton backend l’accepte
 });
