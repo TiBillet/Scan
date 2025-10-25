@@ -12,16 +12,17 @@
       <!--appel nom lieu -->
       <div id="network-status" class="ping">...</div>
     </header>
-    <div class="container">
-      <button id="startApp">Démarrer l'application</button>
-    </div>
-
+    <main>
+      <div class="container">
+        <button id="startApp">Démarrer l'application</button>
+      </div>
+    </main>
     <script>
       document.getElementById("startApp").addEventListener("click", () => {
         const apiKey = localStorage.getItem("apiKey");
 
         if (apiKey) {
-          window.location.href = "lieux.html";
+          window.location.href = "events.html";
         } else {
           window.location.href = "pairing.html";
         }
@@ -46,5 +47,6 @@
 
     <script src="cordova.js"></script>
     <script src="js/index.js"></script>
+    <script src="js/noscroll.js"></script>
   </body>
 </html>

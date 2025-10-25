@@ -5,28 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Liste des billets</title>
     <link rel="stylesheet" href="./css/style.css" />
-    <!-- <style>
-     body {
-      font-family: sans-serif;
-      margin: 0;
-      padding: 20px;
-      background-color: #f4f4f4;
-    } 
-
-
-  </style> -->
   </head>
+
   <body>
-    <h1>Billets réservés</h1>
-    <input
-      type="text"
-      id="search"
-      placeholder="🔍 Rechercher un nom ou un email..."
-    />
+    <header class="bandeau">
+      <div class="nom-lieu">Nom du Lieu</div>
+      <div id="network-status" class="ping">...</div>
+    </header>
+    <main>
+      <h1>Billets réservés</h1>
+      <input
+        type="text"
+        id="search"
+        placeholder="🔍 Rechercher un nom ou un email..."
+      />
 
-    <ul id="reservation-list"></ul>
-
+      <ul id="reservation-list"></ul>
+    </main>
     <script src="cordova.js"></script>
+    <script src="js/index.js"></script>
     <script src="js/list.js"></script>
   </body>
 </html>

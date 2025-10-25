@@ -26,13 +26,19 @@ document.addEventListener("deviceready", function () {
 
   initScanner();
 
-  document.getElementById("startScan").addEventListener("click", scanQRCode);
+  const startScanBtn = document.getElementById("startScan");
+  const scannerOverlay = document.getElementById("scanner-overlay");
+
+  startScanBtn.addEventListener("click", () => {
+    startScanBtn.style.display = "none";
+    scannerOverlay.classList.remove("hidden");
+    scanQRCode();
+  });
 
   window.addEventListener("online", () => {
     console.log("Connexion rétablie, tentative de synchro.");
     envoyerBilletsStockes();
   });
-
   if (navigator.onLine) {
     envoyerBilletsStockes();
   }
@@ -49,13 +55,27 @@ function initScanner() {
     }
 
     if (status.authorized) {
-      // scan ready
+      // forcer l’autofocus continu si dispo
+      if (typeof QRScanner.setCameraPreviewConfiguration === "function") {
+        QRScanner.setCameraPreviewConfiguration(
+          {
+            focusMode: "continuous",
+          },
+          function (err) {
+            if (err) {
+              console.warn("Impossible de définir le focusMode :", err);
+            } else {
+              console.log("Autofocus continu activé.");
+            }
+          }
+        );
+      }
     } else if (status.denied) {
       alert(
-        " Permission refusée pour la caméra. Activez-la dans les paramètres."
+        "Permission refusée pour la caméra. Activez-la dans les paramètres."
       );
     } else {
-      alert(" Permission non accordée. Essayez à nouveau.");
+      alert("Permission non accordée. Essayez à nouveau.");
     }
   });
 }
@@ -64,17 +84,18 @@ function initScanner() {
 function scanQRCode() {
   if (typeof QRScanner === "undefined") {
     alert(
-      " QRScanner n'est pas disponible. Lance l'application sur un téléphone !"
+      "QRScanner n'est pas disponible. Lance l'application sur un téléphone !"
     );
     return;
   }
 
+  // Fond transparent pour la caméra
   document.body.style.backgroundColor = "transparent";
   showScannerFrame();
 
-  QRScanner.scan(function (err, text) {
+  QRScanner.scan(async function (err, text) {
     if (err) {
-      console.error(" Erreur lors du scan :", err);
+      console.error("Erreur lors du scan :", err);
       if (err.name === "SCAN_CANCELED") {
         document.getElementById("qr-content").innerText =
           "Le scan a été annulé.";
@@ -82,24 +103,17 @@ function scanQRCode() {
       return;
     }
 
-    if (text.startsWith("http://") || text.startsWith("https://")) {
-      console.log(" C'est une URL, ouverture dans InAppBrowser !");
-      openInAppBrowser(text);
-    } else {
-      handleQRScan(text);
-    }
+    // traiter comme un billet
+    await handleQRScan(text);
 
+    // Nettoyage après scan
     QRScanner.hide();
     QRScanner.destroy();
+    document.getElementById("scanner-overlay")?.classList.add("hidden");
     hideScannerFrame();
   });
 
   QRScanner.show();
-}
-
-// Ouvre URL externe
-function openInAppBrowser(url) {
-  cordova.InAppBrowser.open(url, "_system");
 }
 
 document.addEventListener("deviceready", async () => {
@@ -230,6 +244,23 @@ async function envoyerBilletServeur(qrcodeData, event_uuid = null) {
         "error",
         "❌ Le billet ne correspond pas à l’événement sélectionné."
       );
+
+      // } else if (result.message === "Ticket already scanned") {
+      //   let extraInfo = "";
+
+      //   // Si l'API a renvoyé des infos sur le scan précédent
+      //   if (result.scan_date || result.responsable) {
+      //     extraInfo += "\n\n";
+      //     if (result.scan_date) {
+      //       extraInfo += `📅 Scanné le : ${new Date(result.scan_date).toLocaleString("fr-FR")}\n`;
+      //     }
+      //     if (result.responsable) {
+      //       extraInfo += `👤 Responsable : ${result.responsable}`;
+      //     }
+      //   }
+
+      //   afficherFeedbackScan("error", `❌ Ce billet a déjà été scanné !${extraInfo}`);
+      // }
     } else if (result.message === "Ticket already scanned") {
       afficherFeedbackScan("error", "❌ Ce billet a déjà été scanné !");
     } else {

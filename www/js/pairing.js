@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   const btn = document.getElementById("startPairing");
+  const pairingOverlay = document.getElementById("pairing-overlay");
   if (!btn) return;
 
   btn.addEventListener("click", () => {
@@ -8,11 +9,15 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    btn.classList.add("hidden");
+    btn.style.display = "none";
+    pairingOverlay.classList.remove("hidden");
+    // btn.classList.add("hidden");
 
     QRScanner.prepare(function (err, status) {
       if (err || !status.authorized) {
         alert("Permission refusée pour la caméra.");
+        pairingOverlay.classList.add("hidden");
+        btn.style.display = "block";
         return;
       }
 
@@ -51,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
               if (data.api_key) {
                 localStorage.setItem("apiKey", data.api_key);
                 alert("✅ Appairage réussi !");
-                window.location.href = "lieux.html";
+                window.location.href = "events.html";
               } else {
                 alert("❌ QR invalide ou clé absente.");
               }

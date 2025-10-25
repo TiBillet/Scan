@@ -1,8 +1,8 @@
 document.addEventListener("deviceready", () => {
   const baseUrl = localStorage.getItem("apiBaseUrl");
+
   cordova.plugin.http.get(
     `${baseUrl}/api/events/`,
-
     {},
     { Accept: "application/json" },
     function (response) {
@@ -11,32 +11,46 @@ document.addEventListener("deviceready", () => {
     },
     function (error) {
       console.error("Erreur HTTP native :", error);
-      document.getElementById("events-container").innerText =
-        "Erreur de chargement.";
+      const list = document.getElementById("events-list");
+      list.innerHTML = "<li>Erreur de chargement.</li>";
     }
   );
 });
 
 function displayEvents(events) {
-  const container = document.getElementById("events-container");
-  container.innerHTML = "";
+  const list = document.getElementById("events-list");
+  list.innerHTML = "";
+
+  if (!events || events.length === 0) {
+    list.innerHTML = "<li>Aucun événement trouvé.</li>";
+    return;
+  }
 
   events.forEach((event) => {
-    const eventElement = document.createElement("div");
-    eventElement.classList.add("event-card");
+    const li = document.createElement("li");
+    li.classList.add("ticket-item");
+    const eventDateObj = new Date(event.startDate);
+    const eventDate = eventDateObj.toLocaleDateString("fr-FR", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const eventTime = eventDateObj.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
 
-    const date = new Date(event.startDate).toLocaleString();
+    li.innerHTML = `
+      <strong>${event.name}</strong>
+      <div class="email">${eventDate} à ${eventTime}</div>
+    `;
 
-    eventElement.innerHTML = `
-        <h2>${event.name}</h2>
-        <p>${event.startDate}</p>
-
-      `;
-
-    eventElement.addEventListener("click", () => {
+    li.addEventListener("click", () => {
       localStorage.setItem("selectedEventUuid", event.uuid);
       window.location.href = "scanner.html";
     });
-    container.appendChild(eventElement);
+
+    list.appendChild(li);
   });
 }

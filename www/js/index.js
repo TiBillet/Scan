@@ -40,32 +40,3 @@ document.addEventListener("deviceready", function () {
     navigator.splashscreen.hide();
   }
 });
-
-// function afficherNomLieu() {
-//   const uuid = localStorage.getItem("selectedEventUuid");
-//   const baseUrl = localStorage.getItem("apiBaseUrl");
-
-//   if (!uuid || !baseUrl) return;
-
-//   const container = document.querySelector(".nom-lieu");
-//   if (!container) return;
-
-//   cordova.plugin.http.get(
-//     `${baseUrl}/api/events/${uuid}/`,
-//     {},
-//     { Accept: "application/json" },
-//     function (response) {
-//       try {
-//         const data = JSON.parse(response.data);
-//         if (data.name) {
-//           container.textContent = data.name;
-//         }
-//       } catch (e) {
-//         console.warn("Erreur parsing JSON event :", e);
-//       }
-//     },
-//     function (error) {
-//       console.warn("Erreur chargement nom du lieu :", error);
-//     }
-//   );
-// }

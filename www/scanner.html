@@ -12,41 +12,49 @@
       <!--appel nom lieu -->
       <div id="network-status" class="ping">...</div>
     </header>
-    <h1>tiQR</h1>
-    <button id="startScan">Lancer le scan</button>
-    <div id="result">
-      <h3>Résultat :</h3>
+    <main>
+      <div id="result" class="event-card">
+        <h2 id="event-name">Chargement de l'événement...</h2>
+        <button id="startScan" class="btn-scan">Lancer le scan</button>
+      </div>
 
-      <h3 id="event-name">Chargement de l'événement...</h3>
-    </div>
+      <div id="scanner-overlay" class="hidden">
+        <div class="mask top"></div>
+        <div class="mask left"></div>
+        <div class="mask right"></div>
+        <div class="mask bottom"></div>
+      </div>
 
-    <div id="scanner-frame" class="hidden">
-      <div class="corner top-left"></div>
-      <div class="corner top-right"></div>
-      <div class="corner bottom-left"></div>
-      <div class="corner bottom-right"></div>
-    </div>
+      <div id="scanner-frame" class="hidden">
+        <div class="corner top-left"></div>
+        <div class="corner top-right"></div>
+        <div class="corner bottom-left"></div>
+        <div class="corner bottom-right"></div>
+      </div>
+    </main>
+    <footer>
+      <!-- <button id="btn-show-reservations">📋 Liste des billets</button> -->
+      <button id="btn-liste-billets" onclick="window.location.href='list.html'">
+        📋 Liste des billets
+      </button>
 
-    <!-- <button id="btn-show-reservations">📋 Liste des billets</button> -->
-    <button onclick="window.location.href='list.html'">
-      📋 Liste des billets
-    </button>
+      <div id="reservation-panel" style="display: none">
+        <input
+          type="text"
+          id="search-reservation"
+          placeholder="🔍 Nom, prénom ou email"
+        />
 
-    <div id="reservation-panel" style="display: none">
-      <input
-        type="text"
-        id="search-reservation"
-        placeholder="🔍 Nom, prénom ou email"
-      />
-
-      <ul id="reservation-list"></ul>
-    </div>
+        <ul id="reservation-list"></ul>
+      </div>
+    </footer>
 
     <script src="cordova.js"></script>
     <script src="js/index.js"></script>
     <script src="js/db.js"></script>
     <script src="js/rsa.js"></script>
     <script src="js/scanner.js"></script>
+    <script src="js/noscroll.js"></script>
 
     <div id="scan-feedback" class="hidden">
       <div id="scan-icon"></div>
