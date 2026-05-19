@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Application de Scan</title>
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+
+  <body>
+    <button id="startPairing">Scanner le QR d'appairage</button>
+
+    <div id="pairing-overlay" class="hidden">
+      <div class="mask top"></div>
+      <div class="mask left"></div>
+      <div class="mask right"></div>
+      <div class="mask bottom"></div>
+    </div>
+
+    <div id="scanner-frame" class="hidden">
+      <div class="corner top-left"></div>
+      <div class="corner top-right"></div>
+      <div class="corner bottom-left"></div>
+      <div class="corner bottom-right"></div>
+    </div>
+
+    <script src="cordova.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/pairing.js"></script>
+    <script src="js/noscroll.js"></script>
+  </body>
+</html>

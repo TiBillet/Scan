@@ -3,26 +3,50 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QR Code Scanner</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <title>Application de Scan</title>
+    <link rel="stylesheet" href="./css/style.css" />
   </head>
   <body>
-    <h1>tiQR</h1>
-    <button id="startScan">Lancer le scan</button>
-    <div id="result">
-      <h3>Résultat :</h3>
-      <p id="qr-content" style="cursor: pointer">Aucun scan effectué</p>
-    </div>
-    <h2>Connexion</h2>
-    <input type="email" id="email" placeholder="Email" />
-    <input type="password" id="password" placeholder="Mot de passe" />
-    <button id="loginButton">Se connecter</button>
-    <button id="logoutButton" style="display: none">Se déconnecter</button>
-    <p id="loginStatus"></p>
+    <header class="bandeau">
+      <div class="nom-lieu">Nom du Lieu</div>
+      <!--appel nom lieu -->
+      <div id="network-status" class="ping">...</div>
+    </header>
+    <main>
+      <div class="container">
+        <button id="startApp">Démarrer l'application</button>
+      </div>
+    </main>
+    <script>
+      document.getElementById("startApp").addEventListener("click", () => {
+        const apiKey = localStorage.getItem("apiKey");
+
+        if (apiKey) {
+          window.location.href = "events.html";
+        } else {
+          window.location.href = "pairing.html";
+        }
+      });
+    </script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          for (let registration of registrations) {
+            registration.unregister().then(() => {
+              console.log("✅ SW désinstallé");
+            });
+          }
+        });
+        caches.keys().then(function (names) {
+          for (let name of names) {
+            caches.delete(name);
+          }
+        });
+      }
+    </script>
 
     <script src="cordova.js"></script>
     <script src="js/index.js"></script>
-    <script src="js/scanner.js"></script>
-    <script src="js/auth.js"></script>
+    <script src="js/noscroll.js"></script>
   </body>
 </html>

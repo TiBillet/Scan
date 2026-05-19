@@ -1,21 +1,27 @@
-async function verify_signature(signatureBase64, message) {
-  console.log(" Vérification de la signature RSA...");
+// Vérification RSA en local avec clé publique donnée
+async function verify_signature(signatureBase64, message, publicKeyPem) {
+  // console.log("=== Début vérification RSA ===");
+  // console.log("Message original:", message);
+  // console.log("Signature (base64):", signatureBase64);
 
-  // Clé publique récupérée une seule fois et stocké localement
-  const publicKeyPem = await getPublicKeyFromServer();
+  if (!publicKeyPem) {
+    console.error("Aucune clé publique fournie !");
+    return false;
+  }
 
   try {
-    console.log(" Importation de la clé publique...");
+    // Importation de la clé
     const publicKey = await importPublicKey(publicKeyPem);
+    console.log("Clé publique importée avec succès");
 
-    console.log(" Conversion du message en buffer...");
+    // Encodage du message
     const enc = new TextEncoder();
     const messageBuffer = enc.encode(message);
 
-    console.log(" Conversion de la signature...");
+    // Conversion de la signature
     const signature = base64ToArrayBuffer(signatureBase64);
 
-    console.log(" Vérification en cours...");
+    // Vérification
     const isValid = await crypto.subtle.verify(
       { name: "RSASSA-PKCS1-v1_5" },
       publicKey,
@@ -23,30 +29,15 @@ async function verify_signature(signatureBase64, message) {
       messageBuffer
     );
 
+    console.log("=== Résultat vérification ===", isValid);
     return isValid;
   } catch (error) {
-    console.error(" Erreur lors de la vérification RSA :", error);
+    console.error("Erreur complète:", error);
     return false;
   }
 }
 
-//  Récupération clé publique du serveur UNE SEULE FOIS
-async function getPublicKeyFromServer() {
-  const cachedKey = localStorage.getItem("publicKey");
-  if (cachedKey) return cachedKey;
-
-  try {
-    const response = await fetch("https://nomduserv/api/public_key");
-    const data = await response.json();
-    localStorage.setItem("publicKey", data.publicKey);
-    return data.publicKey;
-  } catch (error) {
-    console.error(" Erreur de récupération de la clé publique :", error);
-    return null;
-  }
-}
-
-//  Import clé publique PEM
+// Import clé publique PEM (SPKI)
 async function importPublicKey(pem) {
   const binaryDer = Uint8Array.from(
     atob(pem.replace(/-----[^-]+-----|\n/g, "")),
@@ -62,7 +53,7 @@ async function importPublicKey(pem) {
   );
 }
 
-// Convertir Base64 en ArrayBuffer
+// Convertir base64 → ArrayBuffer
 function base64ToArrayBuffer(base64) {
   return Uint8Array.from(atob(base64), (c) => c.charCodeAt(0)).buffer;
 }

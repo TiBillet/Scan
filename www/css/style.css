@@ -1,21 +1,6 @@
-/* body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  margin-top: 50px;
-}
-
-#result {
-  margin-top: 20px;
-  border: 1px solid #ccc;
-  padding: 10px;
-  background-color: #f9f9f9;
-  border-radius: 5px;
-} */
-
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
 }
 
 body {
@@ -25,24 +10,36 @@ body {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  padding: 16px;
+  padding: 20px;
 }
 
-.bandeau {
+main {
+  margin-top: 40px;
   width: 100%;
-  max-width: 400px;
+}
+
+/* footer {
+  width: 100%;
+  flex-shrink: 0;
+} */
+
+.bandeau {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
+  padding: 12px 16px;
   background-color: #333;
   color: #fff;
-  border-radius: 8px 8px 0 0;
   margin-bottom: 16px;
+  box-sizing: border-box;
 }
 
 .nom-lieu {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: bold;
 }
 
@@ -56,11 +53,60 @@ body {
   max-width: 400px;
 }
 
+.btnoff {
+  display: block;
+  width: 100%;
+  padding: 20px;
+  margin: 8px 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #718192;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+#startApp {
+  display: block;
+  width: 100%;
+  padding: 20px;
+  margin: 8px 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
 .btn {
   display: block;
   width: 100%;
   padding: 20px;
   margin: 8px 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.btn-scan {
+  display: block;
+  padding: 10px;
+  margin-top: 15px;
+  margin-right: 30px;
+  margin-left: 30px;
   font-size: 18px;
   font-weight: bold;
   color: #fff;
@@ -85,5 +131,340 @@ body {
 }
 
 #loginButton {
-  color: purple;
+  color: red;
+}
+
+/* EVENTS */
+
+#events-container {
+  width: 300px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.event-card {
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.event-card h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.event-card p {
+  margin: 0.3rem 0;
+  color: #555;
+}
+
+/* anime apres scan */
+
+#scan-feedback {
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 1em;
+  padding: 2em;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  z-index: 9999;
+  animation: pop-in 0.3s ease;
+}
+
+#scan-feedback.success {
+  border: 2px solid green;
+  color: green;
+}
+
+#scan-feedback.error {
+  border: 2px solid red;
+  color: red;
+}
+
+#scan-icon {
+  font-size: 3em;
+  margin-bottom: 1em;
+}
+
+#scan-feedback.hidden {
+  display: none;
+}
+
+@keyframes pop-in {
+  from {
+    transform: scale(0.5) translate(-50%, -50%);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translate(-50%, -50%);
+    opacity: 1;
+  }
+}
+
+#scanner-frame {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.corner {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 4px solid white;
+}
+
+.top-left {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+}
+
+.top-right {
+  top: 0;
+  right: 0;
+  border-left: none;
+  border-bottom: none;
+}
+
+.bottom-left {
+  bottom: 0;
+  left: 0;
+  border-right: none;
+  border-top: none;
+}
+
+.bottom-right {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#startPairing {
+  padding: 1em 2em;
+  font-size: 18px;
+  background-color: #007aff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+ul {
+  width: 100%;
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: white;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  min-height: 95px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.email {
+  font-size: 0.9em;
+  color: #555;
+}
+
+.status {
+  font-size: 0.85em;
+  color: #666;
+  margin-top: 4px;
+}
+
+.status.scanned {
+  color: green;
+}
+
+.status.not-scanned {
+  color: grey;
+}
+
+.valider-btn {
+  margin-top: 5px;
+  padding: 6px 10px;
+  font-size: 14px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* overlay black */
+
+#scanner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+#pairing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+.mask {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.875);
+}
+
+/* cadre central 300x300 */
+.mask.top {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(50% - 150px);
+}
+
+.mask.bottom {
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: calc(50% - 150px);
+}
+
+.mask.left {
+  top: calc(50% - 150px);
+  left: 0;
+  width: calc(50% - 150px);
+  height: 300px;
+}
+
+.mask.right {
+  top: calc(50% - 150px);
+  right: 0;
+  width: calc(50% - 150px);
+  height: 300px;
+}
+
+/* uniformisation des cards  */
+
+.ticket-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ticket-item {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* effet */
+.ticket-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.ticket-item strong {
+  font-size: 1.1em;
+  color: #222;
+}
+
+.ticket-item .email {
+  font-size: 0.9em;
+  color: #555;
+  margin-top: 8px;
+}
+
+/* event card + list btn */
+
+.event-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#btn-liste-billets {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+
+  z-index: 10000;
+  background-color: white;
+  color: black;
+  font-size: 18px;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+/* formulaire  */
+
+.custom-form {
+  margin-top: 8px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 0.85em;
+  color: #444;
+}
+.custom-field strong {
+  color: #222;
 }

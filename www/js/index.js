@@ -1,40 +1,42 @@
-document.addEventListener(
-  "deviceready",
-  function () {
-    console.log(" L'événement 'deviceready' a bien été déclenché !");
-  },
-  false
-);
-
 document.addEventListener("deviceready", onDeviceReady, false);
 
 function onDeviceReady() {
-  console.log(" onDeviceReady est exécuté !");
+  // afficherNomLieu();
+  // Si un scanner existe sur la page
+  if (typeof initScanner === "function") {
+    initScanner();
+  }
 
-  // if ("serviceWorker" in navigator) {
-  //   console.log("🔍 Tentative d'enregistrement du Service Worker...");
-
-  //   navigator.serviceWorker
-  //     .register("service-worker.js", { scope: "./" }) // Chemin relatif pour éviter les conflits
-  //     .then((reg) => {
-  //       console.log("✅ Service Worker enregistré avec succès :", reg.scope);
-  //       if (reg.waiting) {
-  //         reg.waiting.postMessage({ type: "SKIP_WAITING" });
-  //       }
-  //     })
-  //     .catch((err) =>
-  //       console.error("❌ Échec de l’enregistrement du Service Worker :", err)
-  //     );
-  // } else {
-  //   console.warn(" Le navigateur ne supporte pas les Service Workers.");
-  // }
-
-  // Initialiser QRScanner après deviceready
-  initScanner();
+  // Statut réseau
+  updateNetworkStatus();
+  window.addEventListener("online", updateNetworkStatus);
+  window.addEventListener("offline", updateNetworkStatus);
 }
 
-// Sécurité : Si "deviceready" ne se déclenche pas sous localhost, tenter un fallback
+// Gestion du statut réseau
+function updateNetworkStatus() {
+  const statusDiv = document.getElementById("network-status");
+  if (!statusDiv) return;
+
+  if (navigator.onLine) {
+    statusDiv.textContent = "🟢 En ligne";
+    statusDiv.style.color = "green";
+  } else {
+    statusDiv.textContent = "🔴 Hors ligne";
+    statusDiv.style.color = "red";
+  }
+}
+
+// Fallback localhost
 if (location.hostname === "localhost") {
-  console.log(" Mode localhost détecté, tentative de fallback...");
-  onDeviceReady();
+  console.log("Fallback localhost actif.");
+  setTimeout(() => {
+    onDeviceReady();
+  }, 500);
 }
+
+document.addEventListener("deviceready", function () {
+  if (navigator.splashscreen) {
+    navigator.splashscreen.hide();
+  }
+});
