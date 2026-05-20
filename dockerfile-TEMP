@@ -1,0 +1,61 @@
+#FROM node:jod-trixie-slim
+FROM node:jod-bullseye-slim
+#FROM node:20
+
+RUN apt update
+RUN apt upgrade -y
+
+RUN apt install -y nano iputils-ping curl borgbackup cron git sqlite3 wget unzip openjdk-11-jdk
+
+# Install Android SDK
+# RUN mkdir -p /opt/android-sdk && cd /opt/android-sdk && \
+#     wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip && \
+#     unzip commandlinetools-linux-11076708_latest.zip && \
+#     mkdir -p cmdline-tools/latest && \
+#     mv cmdline-tools/bin cmdline-tools/lib cmdline-tools/latest/ 2>/dev/null || true && \
+#     rm commandlinetools-linux-11076708_latest.zip
+
+ENV ANDROID_HOME=/opt/android-sdk
+ENV ANDROID_SDK_ROOT=/opt/android-sdk
+ENV PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${PATH}"
+
+# Accept licenses and install required SDK components
+# RUN yes | sdkmanager --licenses && \
+#     sdkmanager "platform-tools" "platforms;android-34" "platforms;android-35" "build-tools;34.0.0" "build-tools;35.0.0"
+
+
+# # Install Gradle 6.9
+RUN cd /opt && \
+    wget https://services.gradle.org/distributions/gradle-6.9-bin.zip && \
+    unzip gradle-6.9-bin.zip && \
+    rm gradle-6.9-bin.zip
+
+ENV PATH="/opt/gradle-6.9/bin:${PATH}"
+
+
+# Install Gradle 7.3
+# RUN cd /opt && \
+#     wget https://services.gradle.org/distributions/gradle-7.3-bin.zip && \
+#     unzip gradle-7.3-bin.zip && \
+#     rm gradle-7.3-bin.zip
+#
+# ENV PATH="/opt/gradle-7.3/bin:${PATH}"
+
+
+
+# ENV PATH="/home/scan/.local/bin:$PATH"
+
+
+WORKDIR /root/ScanApp
+
+COPY ./bashrc /root/.bashrc
+
+#RUN npm
+#
+# RUN npm config set user 0
+# RUN npm config set unsafe-perm true
+
+#CMD ["bash", "start.sh"]
+
+
+# docker build -t scan .
