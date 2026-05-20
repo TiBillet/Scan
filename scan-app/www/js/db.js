@@ -40,7 +40,7 @@ async function savePublicKey(event_uuid, publicKeyPem) {
 async function fetchEvents() {
   try {
     const response = await fetch(
-      "https://lespass.demo.tibillet.org/api/events/"
+      "https://lespass.demo.tibillet.org/api/events?only_futur=true"
     );
     if (!response.ok)
       throw new Error("Erreur lors de la récupération des événements");

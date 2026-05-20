@@ -1,8 +1,9 @@
 document.addEventListener("deviceready", () => {
   const baseUrl = localStorage.getItem("apiBaseUrl");
+  const search = document.getElementById("search");
 
   cordova.plugin.http.get(
-    `${baseUrl}/api/events/`,
+    `${baseUrl}/api/events?only_futur=true`,
     {},
     { Accept: "application/json" },
     function (response) {
@@ -15,6 +16,37 @@ document.addEventListener("deviceready", () => {
       list.innerHTML = "<li>Erreur de chargement.</li>";
     }
   );
+
+  function filterEvent(Event) {
+    let searchValue = search.value
+    const searchString = (searchValue || "").trim();
+
+    const url = `${baseUrl}/api/events?only_futur=true&filter=${searchString}`;
+
+    cordova.plugin.http.get(
+        url,
+        {},
+        { Accept: "application/json" },
+        function (response) {
+          const events = JSON.parse(response.data);
+          displayEvents(events);
+        },
+        function (error) {
+          console.error("Erreur HTTP native :", error);
+          const list = document.getElementById("events-list");
+          list.innerHTML = "<li>Erreur de chargement.</li>";
+        }
+    );
+  }
+
+
+  if (search) {
+    search.addEventListener("input", debounce(filterEvent,1000))
+
+    // search.addEventListener("input", () => {
+    //   filterEvent(search.value || "");
+    // });
+  }
 });
 
 function displayEvents(events) {
@@ -53,4 +85,13 @@ function displayEvents(events) {
 
     list.appendChild(li);
   });
+}
+
+function debounce(callback, delay) {
+  let timer; // Variable to store the timeout ID
+
+  return function (...args) {
+    clearTimeout(timer); // Clear the previous timeout
+    timer = setTimeout(() => callback(...args), delay); // Set a new timeout
+  };
 }
