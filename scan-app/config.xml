@@ -24,7 +24,7 @@
     <!-- FIN -->
 
     <preference name="AndroidXEnabled" value="true" />
-    <preference name="GradlePluginGoogleServicesEnabled" value="true" />
+    <preference name="GradlePluginGoogleServicesEnabled" value="false" />
     <preference name="SplashScreen" value="none" />
     <preference name="SplashScreenDelay" value="0" />
     <preference name="AutoHideSplashScreen" value="true" />
