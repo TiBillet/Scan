@@ -1,15 +1,7 @@
 #!/bin/bash
 clear \
 && cordova platform remove android \
+&& cordova plugin add https://github.com/fluxguide/cordova-plugin-qr-barcode-scanner/tree/58fed73a7c6e306a0a9fef3fe4586706e9b73a33 \
+&& cordova plugin add cordova-plugin-advanced-http \
 && cordova platform add android@14.0.0 \
 && cordova build android
-
-
-#&& cordova plugin add /cordova_local_plugins/cordova-plugin-connectivity \
-#&& cordova plugin add /cordova_local_plugins/cordova-plugin-sunmi-printer \
-#&& cordova plugin add /cordova_local_plugins/cordova-plugin-nfc-reader \
-#&& cordova plugin add cordova-plugin-device \
-#&& cordova plugin add cordova-plugin-networkinterface \
-#&& cordova plugin add cordova-plugin-file \
-#&& cordova plugin add cordova-plugin-android-permissions \
-#&& cordova plugin add cordova-plugin-app-version \
