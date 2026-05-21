@@ -1,6 +1,9 @@
+var are_event_loaded = false;
+
 document.addEventListener("deviceready", () => {
   const baseUrl = localStorage.getItem("apiBaseUrl");
   const search = document.getElementById("search");
+  search.value = "" // reset search value
 
   cordova.plugin.http.get(
     `${baseUrl}/api/events?only_futur=true`,
@@ -17,35 +20,10 @@ document.addEventListener("deviceready", () => {
     }
   );
 
-  function filterEvent(Event) {
-    let searchValue = search.value
-    const searchString = (searchValue || "").trim();
-
-    const url = `${baseUrl}/api/events?only_futur=true&filter=${searchString}`;
-
-    cordova.plugin.http.get(
-        url,
-        {},
-        { Accept: "application/json" },
-        function (response) {
-          const events = JSON.parse(response.data);
-          displayEvents(events);
-        },
-        function (error) {
-          console.error("Erreur HTTP native :", error);
-          const list = document.getElementById("events-list");
-          list.innerHTML = "<li>Erreur de chargement.</li>";
-        }
-    );
-  }
-
-
   if (search) {
-    search.addEventListener("input", debounce(filterEvent,1000))
-
-    // search.addEventListener("input", () => {
-    //   filterEvent(search.value || "");
-    // });
+    search.addEventListener("input", () => {
+      filterEvents(search.value || "");
+    });
   }
 });
 
@@ -74,7 +52,7 @@ function displayEvents(events) {
     });
 
     li.innerHTML = `
-      <strong>${event.name}</strong>
+      <strong class="event-name">${event.name}</strong>
       <div class="email">${eventDate} à ${eventTime}</div>
     `;
 
@@ -85,13 +63,39 @@ function displayEvents(events) {
 
     list.appendChild(li);
   });
+  are_event_loaded = true;
 }
 
-function debounce(callback, delay) {
-  let timer; // Variable to store the timeout ID
+function filterEvents(textValue = ""){
+  // Si les événements n'ont pas chargé, ne fais rien
+  if(!are_event_loaded){
+    return;
+  }
+  var eventsList = document.querySelector("#events-list").querySelectorAll("li")
+  // Trim the
+  textValue = textValue.toLowerCase().trim()
+  // Replace all the accent in the searched
+  textValue = textValue.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 
-  return function (...args) {
-    clearTimeout(timer); // Clear the previous timeout
-    timer = setTimeout(() => callback(...args), delay); // Set a new timeout
-  };
+  // If search text is empty, just set all events to visible
+  if (textValue === ""){
+    for (let event of eventsList) {
+      event.classList.remove("hidden")
+    }
+    return
+  }
+
+  for(let event of eventsList){
+    // Remove space, set text to lowercase and remove accent to make the search easier
+    let name = event.querySelector(".event-name").textContent.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+    let name_contain = name.includes(textValue)
+
+    if(!name_contain){
+      event.classList.add("hidden");
+      continue;
+    }
+
+    event.classList.remove("hidden")
+  }
+
 }
