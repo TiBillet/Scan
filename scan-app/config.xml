@@ -2,8 +2,8 @@
 <widget id="coop.tibillet.scanqrcode" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>TiBillet Scan</name>
     <description>An app for scanning ticket in TiBillet</description>
-    <author email="contact@tibillet.re" href="https://tibillet.coop/">
-        Tibillet
+    <author email="contact@codecommun.coop" href="https://codecommun.coop/">
+        Coopérative Code Commun
     </author>
 
     <icon src="res/icon.png" />
