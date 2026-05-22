@@ -38,7 +38,7 @@ main {
   box-sizing: border-box;
 }
 
-.nom-lieu {
+#nom-lieu {
   font-size: 20px;
   font-weight: bold;
 }

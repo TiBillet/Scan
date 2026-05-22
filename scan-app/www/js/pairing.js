@@ -55,6 +55,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
               if (data.api_key) {
                 localStorage.setItem("apiKey", data.api_key);
+                if(data.tenant_name){
+                  localStorage.setItem("tenantName", data.tenant_name);
+                }
                 alert("✅ Appairage réussi !");
                 window.location.href = "events.html";
               } else {

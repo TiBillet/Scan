@@ -71,18 +71,18 @@ function filterEvents(textValue = ""){
   if(!are_event_loaded){
     return;
   }
-  var eventsList = document.querySelector("#events-list").querySelectorAll("li")
-  // Trim the
-  textValue = textValue.toLowerCase().trim()
-  // Replace all the accent in the searched
+  var eventsList = document.querySelector("#events-list").querySelectorAll("li");
+  // Trim the search value
+  textValue = textValue.toLowerCase().trim();
+  // Replace all the accent in the search value
   textValue = textValue.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 
   // If search text is empty, just set all events to visible
   if (textValue === ""){
     for (let event of eventsList) {
-      event.classList.remove("hidden")
+      event.classList.remove("hidden");
     }
-    return
+    return;
   }
 
   for(let event of eventsList){

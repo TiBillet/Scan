@@ -38,9 +38,10 @@ async function savePublicKey(event_uuid, publicKeyPem) {
 
 // recup events et stockage des clés publiques
 async function fetchEvents() {
+  const baseUrl = localStorage.getItem("apiBaseUrl");
   try {
     const response = await fetch(
-      "https://lespass.demo.tibillet.org/api/events?only_futur=true"
+      `${baseUrl}/api/events?only_futur=true`
     );
     if (!response.ok)
       throw new Error("Erreur lors de la récupération des événements");

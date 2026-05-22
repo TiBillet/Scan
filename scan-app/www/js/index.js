@@ -1,7 +1,7 @@
 document.addEventListener("deviceready", onDeviceReady, false);
 
 function onDeviceReady() {
-  // afficherNomLieu();
+  displayTenantName();
   // Si un scanner existe sur la page
   if (typeof initScanner === "function") {
     initScanner();
@@ -11,6 +11,15 @@ function onDeviceReady() {
   updateNetworkStatus();
   window.addEventListener("online", updateNetworkStatus);
   window.addEventListener("offline", updateNetworkStatus);
+}
+
+function displayTenantName(){
+  const tenantName = localStorage.getItem("tenantName");
+  // Check if the tenant name is not null
+  if(!tenantName) return;
+  // Set the div containing name to the tenant name
+  const div_lieu = document.querySelector("#nom-lieu");
+  div_lieu.textContent = tenantName;
 }
 
 // Gestion du statut réseau
